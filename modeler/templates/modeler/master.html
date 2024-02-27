@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ModelER</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link rel="icon" type="image/png" href="{% static 'modeler/images/logo.png' %}">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'modeler/stylesheet.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://kit.fontawesome.com/902453c4f7.js" crossorigin="anonymous"></script>
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+
+    <div class="header">
+        <div class="nav-container">
+            <a href="{% url 'modeler:index' %}" class="flex">
+                {% load static %}
+                <img src="{% static 'modeler/images/logo.png' %}" alt="logo">
+                <div class="flex flex-center">
+                    <h1 id="logo-txt">ModelER</h1>
+                </div>
+            </a>
+            <div class="user-div">
+                <a href="#"><button class="btn nav-btn">Sign up</button></a>
+            </div>
+            <span class="material-symbols-outlined nav-bar">
+                menu
+            </span>
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

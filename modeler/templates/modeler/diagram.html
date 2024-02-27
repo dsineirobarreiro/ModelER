@@ -1,0 +1,32 @@
+{% extends 'modeler/master.html' %}
+
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.js"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="grid diagram">
+
+        {% if not_loaded %}
+
+            <div class="flex flex-center">
+                <div class="loader"></div>
+            </div>
+        
+        {% else %}
+            <div id="paper"></div>
+            <!--div class="chat-container grid grid-2-1">
+                <div class="chat-conver"></div>
+                <div class="chat-input flex"></div>
+            </div-->
+        {% endif %}
+    </div>
+
+    {% load static %}
+    <script src="{% static 'modeler/ajax.js' %}"></script>
+
+{% endblock %}

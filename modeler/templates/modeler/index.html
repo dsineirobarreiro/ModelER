@@ -1,0 +1,66 @@
+{% extends 'modeler/master.html' %}
+
+{% block content %}
+
+    <div class="intro">
+        <div class="flex">
+            <div class="flex-item-left">
+                <div class="pageholder flex flex-column">
+                    <div class="spacer-48"></div>
+                    <div class="text_area">
+                        <h1 class="heading">Simplify Database Modeling with ModelER</h1>
+                        <p class="subheading">
+                            Generate ER diagrams for relational databases with the power of AI and natural language processing. 
+                            Describe your scenario, and let ModelER create accurate diagrams for you.
+                        </p>
+                    </div>
+                    <a href="{% url 'modeler:model' %}"><button class="btn page-btn">Get started</button></a>
+                    <div class="spacer-96"></div>
+                </div>
+            </div>
+            <div id="intro-right" class="flex-item-right flex flex-center">
+                {% load static %}
+                <img id="intro-img" src="{% static 'modeler/images/intro2.png' %}" alt="">
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-center">
+        <div class="divider"></div>
+    </div>
+    <div class="flex flex-column flex-center padding-20-0">
+        <div class="spacer-64"></div>
+        <h1 class="title-medium">Our Services</h1>
+        <div class="spacer-48"></div>
+        <div class="flex flex-wrap jeven serv-container">
+            <div class="serv-item">
+                {% load static %}
+                <img src="{% static 'modeler/images/service.png' %}" alt="" class="serv-img">
+                <h2 class="title-small">Prompt Text Analysis</h2>
+                <p class="text-medium">Analyze your prompt text to understand the requirements and constraints of your real case scenario for generating the ER diagram.</p>
+            </div>
+            <div class="serv-item">
+                {% load static %}
+                <img src="{% static 'modeler/images/service2.png' %}" alt="" class="serv-img">
+                <h2 class="title-small">Visualization and Customization</h2>
+                <p class="text-medium">Visualize and customize the generated ER diagram to meet your specific needs and requirements.</p>
+            </div>
+        </div>
+    </div>
+    <div class="spacer-64"></div>
+    <div class="banner top-banner flex flex-center flex-column">
+        <h1 class="title-banner text-center white">Unlock the power of data with intuitive ER diagrams.</h1>
+        <div class="spacer-32"></div>
+        <p class="text-banner text-center white">Let AI handle your database modeling. Get started today!</p>
+    </div>
+    <div class="banner bot-banner">
+        {% load static %}
+        <img src="{% static 'modeler/images/banner2.png' %}" alt="" class="img-banner">
+    </div>
+    <div class="footer flex flex-column" style="height: 200px;">
+        <p class="footer-title">ModelER</p>
+        <div class="spacer-64"></div>
+        <p class="text-medium">&#169; 2023 ModelER</p>
+        <div class="spacer-32"></div>
+    </div>
+
+{% endblock %}
