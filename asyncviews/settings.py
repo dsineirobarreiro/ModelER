@@ -130,4 +130,4 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-from .nlp import llamacpp_with_character_level_parser as LLM
+#from .nlp import llamacpp_with_character_level_parser as LLM

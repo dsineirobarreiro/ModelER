@@ -9,24 +9,25 @@
 
 {% block content %}
 
-    <div class="grid diagram">
-
-        {% if not_loaded %}
-
-            <div class="flex flex-center">
-                <div class="loader"></div>
-            </div>
-        
-        {% else %}
-            <div id="paper"></div>
-            <!--div class="chat-container grid grid-2-1">
-                <div class="chat-conver"></div>
-                <div class="chat-input flex"></div>
-            </div-->
-        {% endif %}
+    
+    <div id="graphDiv">
     </div>
 
-    {% load static %}
-    <script src="{% static 'modeler/ajax.js' %}"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.mjs';
+        mermaid.initialize({ startOnLoad: false });
+    
+        // Example of using the render function
+        const drawDiagram = async function () {
+            let element = document.querySelector('#graphDiv');
+            const graphDefinition = 'graph TB\na-->b';
+            const { svg } = await mermaid.render('graphDiv', graphDefinition);
+            element.innerHTML = svg;
+            document.body.appendChild(element);
+        };
+
+    
+        await drawDiagram();
+    </script>
 
 {% endblock %}

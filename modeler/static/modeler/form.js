@@ -41,7 +41,9 @@ function sendForm(event) {
         }
     );
     document.getElementById('promptForm').reset();
-    button.disabled = true; //setting button state to disabled
+    //setting inputs state to disabled
+    button.disabled = true; 
+    input.disabled = true;
     var chat = document.getElementById('chat');
     chat.innerHTML += `
     <div class="message">
@@ -197,57 +199,57 @@ function sendForm(event) {
 
             Object.entries(data).forEach(([key, value]) =>{
 
-            let ent = new erd.Entity({
+                let ent = new erd.Entity({
 
-                position: { x: ex, y: ey },
-                attrs: {
-                    text: {
-                        fill: '#ffffff',
-                        text: key,
-                        letterSpacing: 0,
-                        style: { textShadow: '1px 0 1px #333333' }
-                    },
-                    '.outer': {
-                        fill: '#31d0c6',
-                        stroke: 'none',
-                        filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
-                    },
-                    '.inner': {
-                        fill: '#31d0c6',
-                        stroke: 'none',
-                        filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+                    position: { x: ex, y: ey },
+                    attrs: {
+                        text: {
+                            fill: '#ffffff',
+                            text: key,
+                            letterSpacing: 0,
+                            style: { textShadow: '1px 0 1px #333333' }
+                        },
+                        '.outer': {
+                            fill: '#31d0c6',
+                            stroke: 'none',
+                            filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+                        },
+                        '.inner': {
+                            fill: '#31d0c6',
+                            stroke: 'none',
+                            filter: { name: 'dropShadow',  args: { dx: 0.5, dy: 2, blur: 2, color: '#333333' }}
+                        }
                     }
+                });
+                graph.addCell(ent);
+
+                let x = ent.get('position').x - 75
+                let y = ent.get('position').y - 75
+                for (i=0; i < value.length; i++){
+                    let attr = new erd.Normal({
+
+                        position: { x: x, y: y },
+                        attrs: {
+                            text: {
+                                fill: '#ffffff',
+                                text: value[i],
+                                letterSpacing: 0,
+                                style: { textShadow: '1px 0 1px #333333' }
+                            },
+                            '.outer': {
+                                fill: '#fe8550',
+                                stroke: '#fe854f',
+                                filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
+                            }
+                        }
+                    });
+                    graph.addCell(attr);
+                    createLink(ent, attr);
+                    x += 75;
+                    y -= 75
                 }
-            });
-            graph.addCell(ent);
 
-            let x = ent.get('position').x - 75
-            let y = ent.get('position').y - 75
-            for (i=0; i < value.length; i++){
-            let attr = new erd.Normal({
-
-                position: { x: x, y: y },
-                attrs: {
-                    text: {
-                        fill: '#ffffff',
-                        text: value[i],
-                        letterSpacing: 0,
-                        style: { textShadow: '1px 0 1px #333333' }
-                    },
-                    '.outer': {
-                        fill: '#fe8550',
-                        stroke: '#fe854f',
-                        filter: { name: 'dropShadow',  args: { dx: 0, dy: 2, blur: 2, color: '#222138' }}
-                    }
-                }
-            });
-            graph.addCell(attr);
-            createLink(ent, attr);
-            x += 75;
-            y -= 75
-            }
-
-            ex += 400;
+                ex += 400;
             })
 
 
@@ -432,6 +434,8 @@ function sendForm(event) {
             createLink(wage, paid).set(createLabel('N'));
             createLink(wage, amount);
             createLink(wage, date);*/
+
+            input.disabled = false;
         });
 }
 

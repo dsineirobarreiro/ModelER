@@ -1,7 +1,6 @@
 import asyncio
 import json
 from django.http import HttpResponseBadRequest, JsonResponse
-import httpx
 
 from django.views.generic import TemplateView
 from django.shortcuts import render
@@ -10,8 +9,10 @@ from django.conf import settings
 from .forms import ModelForm
 
 async def process_prompt(prompt):
-    generate = settings.LLM
-    result = json.loads(generate(prompt))
+    await asyncio.sleep(5)
+    """generate = settings.LLM
+    result = json.loads(generate(prompt))"""
+    result = json.loads("""{"entities":[{"name":"Client","attributes":["name","email","phone"]},{"name":"Bank","attributes":["name","branch","contact"]},{"name":"Transaction","attributes":["id","account","date","amount"]}],"relations":[{"source":"Client","target":"Bank","name":"client_bank"},{"source":"Bank","target":"Transaction","name":"bank_transaction"}]}""")
     print(result)
     diagram = {}
     for entity in result['entities']:
@@ -31,10 +32,11 @@ class ModelView(TemplateView):
     form_class = ModelForm
     initial = {"key": "value"}
     template_name = "modeler/model.html"
+    stop = False
 
     async def get(self, request, *args, **kwargs):
         form = self.form_class(initial=self.initial)
-        return render(request, self.template_name, {'form': form, 'data': ''})
+        return render(request, self.template_name, {'form': form})
 
     async def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -49,17 +51,6 @@ class ModelView(TemplateView):
                 return JsonResponse(diagram)
         else:
             return HttpResponseBadRequest('Invalid request')
-        """data = ''
-        if not bool(request.headers.get('X-Custom', False)):
-            if form.is_valid():
-                self.first_prompt = True
-                prompt = form.cleaned_data['prompt']
-                loop = asyncio.get_event_loop()
-                loop.create_task(http_call_async(prompt, request.COOKIES))
-        else:
-            data = (request.body.decode())
-            print(data)
-        return render(request, self.template_name, {'form': form, 'data': data})"""
 
 class DiagramView(TemplateView):
     template_name = 'modeler/diagram.html'
