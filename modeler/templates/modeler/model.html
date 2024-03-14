@@ -1,9 +1,6 @@
 {% extends 'modeler/master.html' %}
 
 {% block head %}
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'modeler/tabs.css' %}">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone.js"></script>
@@ -12,42 +9,41 @@
 
 {% block content %}
         
-    <div class="grid diagram">
+    <div class="grid model-grid">
 
-
-        <div class="tab-wrap">
-            <!-- Tab 1 -->
-            <input type="radio" name="tabs" id="tab1" checked>
-            <div class="tab-label-content" id="tab1-content">
-                <label for="tab1">JointJS</label>
-            </div>
-            <!-- Tab 2 -->
-            <input type="radio" name="tabs" id="tab2">
-            <div class="tab-label-content" id="tab2-content">
-                <label for="tab2">D2</label>
-            </div>
-            <!-- Tab 3 -->
-            <input type="radio" name="tabs" id="tab3">
-            <div class="tab-label-content" id="tab3-content">
-                <label for="tab3">Mermaid</label>
-            </div>
-            <!-- Tab 4 -->
-            <input type="radio" name="tabs" id="tab4">
-            <div class="tab-label-content" id="tab4-content">
-                <label for="tab4">PlantUML</label>
+        <div class="diagram grid">
+            <div class="tab">
+                <button class="tablink btn tab-btn" id="defaultOpen" onclick="openDiagram('JointJS', 0)">JointJS</button>
+                <button class="tablink btn tab-btn" onclick="openDiagram('Mermaid', 1)">Mermaid</button>
+                <button class="tablink btn tab-btn" onclick="openDiagram('PlantUml', 2)">PlantUml</button>
+                <button class="btn download-btn">
+                    <i class="fa-solid fa-download fa-2xl"></i>
+                </button>
+    
+                <div class="slide" id="slide"></div>
             </div>
 
-            <div class="slide"></div>
-            
+            <div id="JointJS" class="tab-content">
+                <div id="paper" class="flex flex-center">
+
+                    <div class="flex flex-center" id="loader">
+                        <div class="loader"></div>
+                    </div>
+    
+                </div>
+            </div>
+
+            <div id="Mermaid" class="tab-content">
+                <h3>B</h3>
+                <p>Home is where the heart is..</p>
+            </div>
+
+            <div id="PlantUml" class="tab-content">
+                <h3>C</h3>
+                <p>Home is where the heart is..</p>
+            </div>
         </div>
 
-        <div id="paper" class="flex flex-center">
-
-            <div class="flex flex-center" id="loader">
-                <div class="loader"></div>
-            </div>
-
-        </div>
 
         <div class="messages-chat" id="chat">
             <div class="message">
@@ -73,9 +69,37 @@
     </div>
 
     {% load static %}
-    <script src="{% static 'modeler/ajax.js' %}"></script>
+    <script src="{% static 'modeler/form.js' %}" type="module"></script>
+
     {% load static %}
-    <script src="{% static 'modeler/form.js' %}"></script>
+    <script src="{% static 'modeler/joint.js' %}" type="module"></script>
+
+    {% load static %}
+    <script src="{% static 'modeler/mermaid.js' %}" type="module"></script>
+
+    {% load static %}
+    <script src="{% static 'modeler/plantUml.js' %}" type="module"></script>
+
+    <script>
+        function openDiagram(pageName, index) {
+          var i, tabcontent, tablinks, slide;
+          tabcontent = document.getElementsByClassName("tab-content");
+          slide = document.getElementById("slide");
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+          }
+          tablinks = document.getElementsByClassName("tablink");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].style.backgroundColor = "";
+          }
+          document.getElementById(pageName).style.display = "block";
+          let left = 30 * index;
+          slide.style.left = left.toString() + '%';
+        }
+        
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+        </script>
 
 
 {% endblock %}
