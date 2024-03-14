@@ -1,6 +1,6 @@
 import { createJointDiagram } from './joint.js'
 import { createMermaidDiagram } from './mermaid.js'
-import { createPlantDiagram } from './plantUml.js';
+import { createUmlDiagram } from './plantUml.js';
 
 let input = document.querySelector("#id_prompt");
 let button = document.querySelector(".send-btn");
@@ -65,12 +65,12 @@ function sendForm(event) {
             }
             throw new Error('Network response was not ok.');
         })
-        .then(function(data) {
+        .then(async function(data) {
             console.log(data);
 
-            createJointDiagram(data);
-            mermaidDiagram = createMermaidDiagram(data);
-            plantDiagram = createPlantDiagram(data);
+            createJointDiagram(data['raw']);
+            createMermaidDiagram(data['mermaid']);
+            createUmlDiagram(data['uml']);
 
             input.disabled = false;
         });

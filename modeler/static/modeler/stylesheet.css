@@ -465,8 +465,6 @@ textarea {
     /*display: block;*/
     border: 0;
     text-align: center;
-    background: #464a65;
-
 }
 #paper>svg {
     overflow: visible !important;
@@ -474,6 +472,10 @@ textarea {
 .connection,
 .connection-wrap {
     stroke: #ccc0ef;
+}
+
+#mermaid, #plantuml, #jointjs {
+    background-color: #eeeeee;
 }
 
 .messages-chat {

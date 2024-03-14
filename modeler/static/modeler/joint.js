@@ -131,10 +131,12 @@ export function createJointDiagram(data) {
 
     // Create shapes
 
+    let entities = data['entities']
+
     let ex = 200;
     let ey = 350;
 
-    Object.entries(data).forEach(([key, value]) =>{
+    for(var i = 0; i < entities.length; i++){
 
         let ent = new erd.Entity({
 
@@ -142,7 +144,7 @@ export function createJointDiagram(data) {
             attrs: {
                 text: {
                     fill: '#ffffff',
-                    text: key,
+                    text: entities[i]['name'],
                     letterSpacing: 0,
                     style: { textShadow: '1px 0 1px #333333' }
                 },
@@ -162,14 +164,17 @@ export function createJointDiagram(data) {
 
         let x = ent.get('position').x - 75
         let y = ent.get('position').y - 75
-        for (i=0; i < value.length; i++){
+
+        let attributes = entities[i]['attributes']
+
+        for(var j = 0; j < attributes.length; j++){
             let attr = new erd.Normal({
 
                 position: { x: x, y: y },
                 attrs: {
                     text: {
                         fill: '#ffffff',
-                        text: value[i],
+                        text: attributes[j]['name'],
                         letterSpacing: 0,
                         style: { textShadow: '1px 0 1px #333333' }
                     },
@@ -187,7 +192,7 @@ export function createJointDiagram(data) {
         }
 
         ex += 400;
-    })
+    }
 
 
 

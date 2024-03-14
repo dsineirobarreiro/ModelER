@@ -13,9 +13,15 @@
 
         <div class="diagram grid">
             <div class="tab">
-                <button class="tablink btn tab-btn" id="defaultOpen" onclick="openDiagram('JointJS', 0)">JointJS</button>
-                <button class="tablink btn tab-btn" onclick="openDiagram('Mermaid', 1)">Mermaid</button>
-                <button class="tablink btn tab-btn" onclick="openDiagram('PlantUml', 2)">PlantUml</button>
+                <button class="tablink btn tab-btn" id="defaultOpen" onclick="openDiagram('jointjs', 0)">
+                    <span>JointJS</span>
+                </button>
+                <button class="tablink btn tab-btn" onclick="openDiagram('mermaid', 1)">
+                    <span>Mermaid</span>
+                </button>
+                <button class="tablink btn tab-btn" onclick="openDiagram('plantuml', 2)">
+                    <span>PlantUml</span>
+                </button>
                 <button class="btn download-btn">
                     <i class="fa-solid fa-download fa-2xl"></i>
                 </button>
@@ -23,7 +29,7 @@
                 <div class="slide" id="slide"></div>
             </div>
 
-            <div id="JointJS" class="tab-content">
+            <div id="jointjs" class="tab-content">
                 <div id="paper" class="flex flex-center">
 
                     <div class="flex flex-center" id="loader">
@@ -33,14 +39,11 @@
                 </div>
             </div>
 
-            <div id="Mermaid" class="tab-content">
-                <h3>B</h3>
-                <p>Home is where the heart is..</p>
+            <div id="mermaid" class="tab-content">
+                <pre class="mermaid" id="merm-graph"></pre>
             </div>
 
-            <div id="PlantUml" class="tab-content">
-                <h3>C</h3>
-                <p>Home is where the heart is..</p>
+            <div id="plantuml" class="tab-content">
             </div>
         </div>
 
@@ -99,7 +102,7 @@
         
         // Get the element with id="defaultOpen" and click on it
         document.getElementById("defaultOpen").click();
-        </script>
+    </script>
 
 
 {% endblock %}
