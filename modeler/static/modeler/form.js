@@ -29,7 +29,7 @@ const form = document.querySelector('#promptForm');
 
 function sendForm(event) {
     event.preventDefault();
-    var url = form.getAttribute('data-post-url');
+    var url = 'http://127.0.0.1:8001/generate'
     document.getElementById('loader').style.visibility = 'visible';
     var formData = new FormData(form);
     const request = new Request(
@@ -38,9 +38,9 @@ function sendForm(event) {
             method: 'POST',
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
-                'X-CSRFToken': csrfToken
+                'X-CSRFToken': csrfToken,
+                'ngrok-skip-browser-warning': 'true'
             },
-            mode: 'same-origin',
             body: formData,
         }
     );

@@ -11,9 +11,9 @@ from .utils import create_mermaid_diagram, create_uml_diagram
 
 async def process_prompt(prompt):
     await asyncio.sleep(5)
-    """generate = settings.LLM
-    result = json.loads(generate(prompt))"""
-    result = json.loads("""{"entities": [{"name": "Customer", "attributes": [{"name": "customer_id", "type": "integer"}, {"name": "first_name", "type": "string"}, {"name": "last_name", "type": "string"}, {"name": "email", "type": "string"}, {"name": "phone_number", "type": "string"}]}, {"name": "Order", "attributes": [{"name": "order_id", "type": "integer"}, {"name": "customer_id", "type": "integer"}, {"name": "order_date", "type": "date"}, {"name": "total_amount", "type": "decimal"}]}, {"name": "Product", "attributes": [{"name": "product_id", "type": "integer"}, {"name": "product_name", "type": "string"}, {"name": "price", "type": "decimal"}]}], "relations": [{"name": "customer_orders", "source": "Customer", "target": "Order", "cardinality_of_source": "One or Many", "cardinality_of_target": "One or Many"}, {"name": "order_products", "source": "Order", "target": "Product", "cardinality_of_source": "One or Many", "cardinality_of_target": "One or Many"}]}""")
+    generate = settings.LLM
+    result = json.loads(generate(prompt))
+    #result = json.loads("""{"entities": [{"name": "Customer", "attributes": [{"name": "customer_id", "type": "integer"}, {"name": "first_name", "type": "string"}, {"name": "last_name", "type": "string"}, {"name": "email", "type": "string"}, {"name": "phone_number", "type": "string"}]}, {"name": "Order", "attributes": [{"name": "order_id", "type": "integer"}, {"name": "customer_id", "type": "integer"}, {"name": "order_date", "type": "date"}, {"name": "total_amount", "type": "decimal"}]}, {"name": "Product", "attributes": [{"name": "product_id", "type": "integer"}, {"name": "product_name", "type": "string"}, {"name": "price", "type": "decimal"}]}], "relations": [{"name": "customer_orders", "source": "Customer", "target": "Order", "cardinality_of_source": "One or Many", "cardinality_of_target": "One or Many"}, {"name": "order_products", "source": "Order", "target": "Product", "cardinality_of_source": "One or Many", "cardinality_of_target": "One or Many"}]}""")
     print(result)
     diagram = {
         'raw': result,
@@ -38,7 +38,7 @@ class ModelView(TemplateView):
         form = self.form_class(initial=self.initial)
         return render(request, self.template_name, {'form': form})
 
-    async def post(self, request, *args, **kwargs):
+"""    async def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
 
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
@@ -50,15 +50,8 @@ class ModelView(TemplateView):
                 diagram = await loop.create_task(process_prompt(prompt))
                 return JsonResponse(diagram)
         else:
-            return HttpResponseBadRequest('Invalid request')
+            return HttpResponseBadRequest('Invalid request')"""
 
-class DiagramView(TemplateView):
-    template_name = 'modeler/diagram.html'
-    form_class = ModelForm
-    not_loaded = True
-
-    async def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'not_loaded': self.not_loaded})
+class LoginView(TemplateView):
+    template_name = 'modeler/login.html'
     
-    async def post(self, request):
-        return JsonResponse({'status': 'ok'})

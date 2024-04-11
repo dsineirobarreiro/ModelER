@@ -53,7 +53,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "asyncviews.urls"
 
-X_FRAME_OPTIONS = "SAMEORIGIN"
+#X_FRAME_OPTIONS = "SAMEORIGIN"
 
 TEMPLATES = [
     {
@@ -129,5 +129,3 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-#from .nlp import llamacpp_with_character_level_parser as LLM

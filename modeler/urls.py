@@ -5,5 +5,5 @@ app_name = "modeler"
 urlpatterns = [
     path("", views.IndexView.as_view(), name='index'),
     path("model/", views.ModelView.as_view(), name="model"),
-    path("diagram/", views.DiagramView.as_view(), name="diagram"),
+    path("login/", views.LoginView.as_view(), name="login"),
 ]
