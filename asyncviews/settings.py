@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
     "modeler.apps.ModelerConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -71,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = "asyncviews.asgi.application"
+WSGI_APPLICATION = "asyncviews.wsgi.application"
 
 
 # Database
@@ -129,3 +128,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_REDIRECT_URL = "modeler:index"
+LOGOUT_REDIRECT_URL = "modeler:index"

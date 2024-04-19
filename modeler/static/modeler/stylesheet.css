@@ -506,10 +506,6 @@ textarea {
 .response .text {
     background-color: #cde4ff !important;
 }
-
-.login-container {
-    height: calc(100vh - 85px);
-}
       
 @keyframes rotation {
     0% {

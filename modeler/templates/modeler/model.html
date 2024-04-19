@@ -55,7 +55,7 @@
         </div>
 
         <div class="flex acenter chat-input">
-            <form id="promptForm" action="{% url 'modeler:model' %}" method="post" enctype="multipart/form-data">
+            <form id="promptForm" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="flex flex-center jaround">
                     <div class="fieldWrapper">

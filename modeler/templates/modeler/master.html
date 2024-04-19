@@ -24,9 +24,17 @@
                     <h1 id="logo-txt">ModelER</h1>
                 </div>
             </a>
-            <div class="user-div">
-                <a href="{% url 'modeler:login' %}"><button class="btn nav-btn">Sign up</button></a>
-            </div>
+            {% if request.user.is_authenticated %}
+                <div>{{ request.user }}</div>
+                <form action="{% url 'modeler:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Log Out</button>
+                  </form>
+            {% else %}
+                <div class="user-div">
+                    <a href="{% url 'modeler:login' %}"><button class="btn nav-btn">Sign up</button></a>
+                </div>
+            {% endif %}
             <span class="material-symbols-outlined nav-bar">
                 menu
             </span>
