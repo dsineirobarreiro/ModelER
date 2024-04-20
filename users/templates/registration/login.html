@@ -35,18 +35,18 @@
 				</div>
 				<div class="password1">
 					<div class="flex">
-						<i id="email-icon" class="fa-solid fa-lock"></i>
-						{{ form.password1.label }}
+						<i id="lock-icon" class="fa-solid fa-lock"></i>
+						{{ form.password.label }}
 					</div>
 					<div class="sec-2">
-						{{ form.password1.errors }}
-						{{ form.password1 }}
-						<i id="email-icon" class="fa-solid fa-eye show-hide"></i>
+						{{ form.password.errors }}
+						{{ form.password }}
+						<i id="show-icon" class="fa-solid fa-eye show-hide"></i>
 					</div>
 				</div>
 				<button class="btn login-btn" type="submit">Login</button>
 				<div class="login-footer flex jbetween">
-					<a href="{% url 'modeler:signup' %}">
+					<a href="{% url 'users:signup' %}">
 						<span>Sign up</span>
 					</a>
 					<span>Forgot Password?</span>

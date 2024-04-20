@@ -31,13 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "modeler.apps.ModelerConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "modeler.apps.ModelerConfig",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "modeler:index"
 LOGOUT_REDIRECT_URL = "modeler:index"
+
+AUTH_USER_MODEL = "users.User"
