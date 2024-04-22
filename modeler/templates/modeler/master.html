@@ -24,20 +24,37 @@
                     <h1 id="logo-txt">ModelER</h1>
                 </div>
             </a>
-            {% if request.user.is_authenticated %}
-                <div>{{ request.user }}</div>
-                <form action="{% url 'users:logout' %}?next={{request.path}}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Log Out</button>
-                  </form>
-            {% else %}
-                <div class="user-div">
-                    <a href="{% url 'users:login' %}?next={{request.path}}"><button class="btn nav-btn">Sign up</button></a>
+            <div class="flex">
+                
+                <div class="dropdown">
+                    <div class="btn profile-btn">
+                        {% if request.user.is_authenticated %}
+                            <i id="profile-icon" class="fa-solid fa-user fa-2xl"></i>
+                        {% else %}
+                            <i id="profile-icon" class="fa-regular fa-user fa-2xl"></i>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown-content">
+                        {% if request.user.is_authenticated %}
+                            <div>{{ request.user }}</div>
+                            <form action="{% url 'users:logout' %}?next={{request.path}}" method="post">
+                                {% csrf_token %}
+                                <button class="btn nav-btn" type="submit">Log Out</button>
+                            </form>
+                        {% else %}
+                            <div>
+                                <a href="{% url 'users:login' %}?next={{request.path}}"><button class="btn nav-btn">Log in</button></a>
+                            </div>
+                            <div>
+                                <a href="{% url 'users:signup' %}?next={{request.path}}"><button class="btn nav-btn">Sign up</button></a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            {% endif %}
-            <span class="material-symbols-outlined nav-bar">
-                menu
-            </span>
+                <span class="material-symbols-outlined nav-bar">
+                    menu
+                </span>
+            </div>
         </div>
     </div>
 

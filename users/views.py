@@ -8,8 +8,6 @@ from .forms import LoginForm, SignupForm
 
 class CustomLoginView(views.LoginView):
     authentication_form = LoginForm
-    next_page = settings.LOGIN_REDIRECT_URL
-
     
 
 class SignupView(TemplateView):
@@ -24,7 +22,9 @@ class SignupView(TemplateView):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('modeler:login')
+            user = form.save()
+            if user:
+                login(request, user)
+                return redirect(request.GET['next'])
         else:
             return render(request, self.template_name, {'form': form})
