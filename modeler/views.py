@@ -1,7 +1,7 @@
 import asyncio
 import httpx
 
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.views.generic import TemplateView, View
 from django.shortcuts import render
 
@@ -32,6 +32,12 @@ class IndexView(TemplateView):
     async def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {})
 
+
+async def stream_response(response):
+    # Generate data in chunks
+    async for chunk in response:
+        yield chunk
+
 class ModelView(TemplateView):
     form_class = PromptForm
     initial = {"key": "value"}
@@ -45,10 +51,25 @@ class ModelView(TemplateView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            prompt = form.cleaned_data['prompt']
+            #prompt = form.cleaned_data['prompt']
             print(form.cleaned_data)
             headers = {'ngrok-skip-browser-warning': 'true'}
-            with httpx.stream("GET", "https://d731-34-125-194-209.ngrok-free.app/greet/", headers=headers) as r:
-                for text in r.iter_text():
-                    print(text)
-            return JsonResponse({"prompt": prompt})
+            #with httpx.stream("GET", "https://f6a2-104-155-129-7.ngrok-free.app/greet/", headers=headers) as r:
+            #    for text in r.iter_text():
+            #        print(text)
+                #return StreamingHttpResponse(stream_response(r.aiter_lines()), content_type='text/event-stream')
+            async def process_response():
+                async with httpx.AsyncClient() as client:
+                    async with client.stream(
+                        "GET",
+                        "https://f6a2-104-155-129-7.ngrok-free.app/greet/",
+                        headers=headers,
+                    ) as r:
+                        async for text in r.aiter_text():
+                            # Work on chunk and then stream it
+                            yield text
+
+                
+            return StreamingHttpResponse(
+                process_response()
+            )
