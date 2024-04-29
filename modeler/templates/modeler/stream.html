@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+</head>
+<body>
+<h1>Server Sent Events</h1>
+<div id="sse-data"></div>
+<button onclick="startSSE()">Start</button>
+<button onclick="stopSSE()" disabled>Stop</button>
+
+<script>
+    let eventSource;
+    const sseData = document.getElementById('sse-data');
+
+    $(document).ready(function(){
+        console.log('Hola');
+        startSSE();
+    });
+
+    function startSSE() {
+        eventSource = new EventSource('http://localhost:8000/modeler/stream/');
+        eventSource.onmessage = function (ev) {
+            if (ev.data == "$")
+                eventSource.close();
+            else
+                sseData.innerHTML += ev.data;
+        };
+    }
+
+    function stopSSE() {
+        if (eventSource) {
+            eventSource.close();
+        }
+        document.querySelector('button[onclick="startSSE()"]').disabled = false;
+        document.querySelector('button[onclick="stopSSE()"]').disabled = true;
+    }
+</script>
+</body>
+</html>
+

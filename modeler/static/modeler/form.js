@@ -29,8 +29,8 @@ const form = document.querySelector('#promptForm');
 
 function sendForm(event) {
     event.preventDefault();
-    var url = 'http://127.0.0.1:8001/generate'
-    document.getElementById('loader').style.visibility = 'visible';
+    var url = 'https://f729-35-223-10-61.ngrok-free.app/generate'
+    //document.getElementById('loader').style.visibility = 'visible';
     var formData = new FormData(form);
     const request = new Request(
         url,
@@ -60,7 +60,7 @@ function sendForm(event) {
     fetch(request)
         .then((response) => {
             if (response.ok) {
-                document.getElementById('loader').style.display = 'none';
+                //document.getElementById('loader').style.display = 'none';
                 return response.json();
             }
             throw new Error('Network response was not ok.');
@@ -77,4 +77,21 @@ function sendForm(event) {
 }
 
 //// Events
-form.addEventListener('submit', sendForm);
+//form.addEventListener('submit', sendForm);
+
+let eventSource;
+const sseData = document.getElementById('sse-data');
+
+$(document).ready(function(){
+    startSSE();
+});
+
+function startSSE() {
+    eventSource = new EventSource('http://localhost:8000/modeler/stream/');
+    eventSource.onmessage = function (ev) {
+        if (ev.data == "$")
+            eventSource.close();
+        else
+            sseData.innerHTML += ev.data;
+    };
+}

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "modeler.apps.ModelerConfig",
     "users",
-    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -50,7 +50,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "asyncviews.urls"
@@ -73,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "asyncviews.wsgi.application"
+ASGI_APPLICATION = "asyncviews.asgi.application"
 
 
 # Database
