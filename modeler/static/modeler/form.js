@@ -1,7 +1,3 @@
-import { createJointDiagram } from './joint.js'
-import { createMermaidDiagram } from './mermaid.js'
-import { createUmlDiagram } from './plantUml.js';
-
 let input = document.querySelector("#id_prompt");
 let button = document.querySelector(".send-btn");
 
@@ -134,13 +130,4 @@ function startSSE() {
         else
             sseData.innerHTML += ev.data;
     };
-}
-
-const logOutForm = document.getElementById("log-out-form");
-
-if (logOutForm) {
-    document.getElementById("log-out").onclick = function() {
-        console.log('a');
-        logOutForm.submit();
-    }
 }

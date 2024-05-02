@@ -1,0 +1,105 @@
+:root {
+    --gris: rgb(199, 199, 199);
+}
+
+.profile-grid {
+    grid-template-columns: 15% 85%;
+}
+
+#profile-left {
+    border-right: solid var(--gris) 1px;
+}
+
+#user-main {
+    margin-top: 64px;
+}
+
+.user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+#user-name {
+    font-size: x-large;
+}
+
+.profile-tabs {
+    margin-top: 50px;
+    padding: 0;
+    list-style-type: none;
+}
+
+.profile-tab.active {
+    background-color: var(--gris);
+    font-weight: bold;
+}
+
+.profile-tab:hover {
+    background-color: var(--gris);
+}
+
+/* Style the buttons that are used to open the tab content */
+.profile-tab {
+    display: block;
+    padding: 8px 16px;
+    color: black;
+    font-size: larger;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    width: 100%;
+    text-align: left;
+}
+  
+/* Style the tab content */
+.profile-tab-content {
+    padding: 32px 48px;
+    width: 100%;
+}
+
+.card-container {
+    margin-top: 64px;
+}
+
+.gen-card {
+    border: solid var(--gris) 1px;
+    border-radius: 4px;
+    height: 400px;
+    width: 500px;
+    padding: 12px 28px;
+}
+
+.gen-card div {
+    margin: 10px 0;
+}
+
+.gen-grid {
+    margin-top: 40px !important;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    row-gap: 5px;
+    column-gap: 10px;
+}
+
+.grid-sec {
+    color: var(--gris);
+    font-size: 1em;
+}
+
+.line {
+    grid-column: 1/ span 2;
+    height: 0px;
+    border-bottom: 2px solid var(--gris);
+}
+
+.card-btn {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    float: right;
+    font-size: medium;
+    color: #94007b;
+    font-weight: bold;
+}

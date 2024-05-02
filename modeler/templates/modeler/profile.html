@@ -2,10 +2,68 @@
 
 {% block head %}
 
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'modeler/profile.css' %}">
+
+    {% load static %}
+    <script src="{% static 'modeler/module.js' %}"></script>
+
 {% endblock %}
 
 {% block content %}
         
+    <div class="grid profile-grid">
+        <div class="flex flex-column" id="profile-left">
+            <div class="flex flex-column acenter" id="user-main">
+                <div class="user-avatar" style="background-color: antiquewhite;"></div>
+                <div class="spacer-16"></div>
+                <span class="bold" id="user-name">{{user}}</span>
+                <span>{{user.email}}</span>
+            </div>
+            <div class="profile-tabs">
+                <button class="profile-tab tab" name="gen-info" id="defaultOpen" onclick="openTab('gen-info')">General information</button>
+                <button class="profile-tab tab" name="user-setting" onclick="openTab('user-setting')">User settings</button>
+                <button class="profile-tab tab" name="diagrams" onclick="openTab('diagrams')">Diagrams</button>
+            </div>
+        </div>
+        <div>
+            <div id="gen-info" class="profile-tab-content tab-content">
+                <h2>General information</h2>
+                <div class="flex wrap card-container">
+                    <div class="gen-card">
+                        <div>User settings</div>
+                        <h3>User information</h3>
+                        <div>You can edit your name, email address, account password and language.</div>
+                        <div class="gen-grid">
+                            <div class="line"></div>
+                            <span class="grid-sec">NOMBRE</span><span>{{ user }}</span>
+                            <div class="line"></div>
+                            <span class="grid-sec">EMAIL</span><span>{{ user.email }}</span>
+                            <div class="line"></div>
+                            <span class="grid-sec">PASSWORD</span><span>*************</span>
+                            <div class="line"></div>
+                        </div>
+                        <button class="card-btn" onclick="openTab('user-setting')">See more on User settings</button>
+                    </div>
+                </div>
+              </div>
+              
+              <div id="user-setting" class="profile-tab-content tab-content">
+                <h3>User settings</h3>
+              </div>
+              
+              <div id="diagrams" class="profile-tab-content tab-content">
+                <h3>Diagramas</h3>
+              </div>
+            
+        </div>
+    </div>
 
+    <script>
+        $(document).ready(function(){
+            // Get the element with id="defaultOpen" and click on it
+            openTab("gen-info");
+        });
+    </script>
 
 {% endblock %}

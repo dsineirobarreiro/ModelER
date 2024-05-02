@@ -5,6 +5,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.js"></script>
+
+    {% load static %}
+    <script src="{% static 'modeler/module.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -12,14 +15,14 @@
     <div class="grid model-grid">
 
         <div class="diagram grid">
-            <div class="tab">
-                <button class="tablink btn tab-btn" id="defaultOpen" onclick="openDiagram('jointjs', 0)">
+            <div class="model-tabs">
+                <button class="tab btn tab-btn" id="defaultOpen" name="jointjs" onclick="openTab('jointjs'); openDiagram(0)">
                     <span>JointJS</span>
                 </button>
-                <button class="tablink btn tab-btn" onclick="openDiagram('mermaid', 1)">
+                <button class="tab btn tab-btn" name="mermaid" onclick="openTab('mermaid'); openDiagram(1)">
                     <span>Mermaid</span>
                 </button>
-                <button class="tablink btn tab-btn" onclick="openDiagram('plantuml', 2)">
+                <button class="tab btn tab-btn" name="plantuml" onclick="openTab('plantuml'); openDiagram(2)">
                     <span>PlantUml</span>
                 </button>
                 <button class="btn download-btn">
@@ -77,34 +80,16 @@
     {% load static %}
     <script src="{% static 'modeler/form.js' %}" type="module"></script>
 
-    {% load static %}
-    <script src="{% static 'modeler/joint.js' %}" type="module"></script>
-
-    {% load static %}
-    <script src="{% static 'modeler/mermaid.js' %}" type="module"></script>
-
-    {% load static %}
-    <script src="{% static 'modeler/plantUml.js' %}" type="module"></script>
-
     <script>
-        function openDiagram(pageName, index) {
-          var i, tabcontent, tablinks, slide;
-          tabcontent = document.getElementsByClassName("tab-content");
-          slide = document.getElementById("slide");
-          for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-          }
-          tablinks = document.getElementsByClassName("tablink");
-          for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].style.backgroundColor = "";
-          }
-          document.getElementById(pageName).style.display = "block";
-          let left = 30 * index;
-          slide.style.left = left.toString() + '%';
+
+        function openDiagram(index) {
+            var slide;
+            slide = document.getElementById("slide");
+            
+            let left = 30 * index;
+            slide.style.left = left.toString() + '%';
         }
         
-        // Get the element with id="defaultOpen" and click on it
-        document.getElementById("defaultOpen").click();
     </script>
 
 
