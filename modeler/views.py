@@ -5,6 +5,8 @@ from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.views.generic import TemplateView, View
 from django.shortcuts import render
 
+from asgiref.sync import sync_to_async
+
 from .forms import PromptForm
 
 async def stream_data():
@@ -30,7 +32,8 @@ class IndexView(TemplateView):
     template_name = "modeler/index.html"
 
     async def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
+        user = await request.auser()
+        return render(request, self.template_name, {'user': user})
 
 
 async def stream_response(response):
@@ -45,7 +48,8 @@ class ModelView(TemplateView):
 
     async def get(self, request, *args, **kwargs):
         form = self.form_class(initial=self.initial)
-        return render(request, self.template_name, {'form': form})
+        user = await request.auser()
+        return render(request, self.template_name, {'user': user,'form': form})
 
     async def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -73,3 +77,10 @@ class ModelView(TemplateView):
             return StreamingHttpResponse(
                 process_response()
             )
+
+class ProfileView(TemplateView):
+    template_name = 'modeler/profile.html'
+
+    async def get(self, request, *args, **kwargs):
+        user = await request.auser()
+        return render(request, self.template_name, {'user': user})

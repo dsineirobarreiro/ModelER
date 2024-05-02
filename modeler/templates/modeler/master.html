@@ -28,26 +28,22 @@
                 
                 <div class="dropdown">
                     <div class="btn profile-btn">
-                        {% if request.user.is_authenticated %}
+                        {% if user.is_authenticated %}
                             <i id="profile-icon" class="fa-solid fa-user fa-2xl"></i>
                         {% else %}
                             <i id="profile-icon" class="fa-regular fa-user fa-2xl"></i>
                         {% endif %}
                     </div>
                     <div class="dropdown-content">
-                        {% if request.user.is_authenticated %}
-                            <div>{{ request.user }}</div>
-                            <form action="{% url 'users:logout' %}?next={{request.path}}" method="post">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'modeler:profile' %}" class="drop-item bold">{{ user }}</a>
+                            <form action="{% url 'users:logout' %}?next={{request.path}}" method="post" id="log-out-form">
                                 {% csrf_token %}
-                                <button class="btn nav-btn" type="submit">Log Out</button>
+                                <a class="drop-item" id="log-out">Log Out</a>
                             </form>
                         {% else %}
-                            <div>
-                                <a href="{% url 'users:login' %}?next={{request.path}}"><button class="btn nav-btn">Log in</button></a>
-                            </div>
-                            <div>
-                                <a href="{% url 'users:signup' %}?next={{request.path}}"><button class="btn nav-btn">Sign up</button></a>
-                            </div>
+                            <a href="{% url 'users:login' %}?next={{request.path}}" class="drop-item">Log in</a>
+                            <a href="{% url 'users:signup' %}?next={{request.path}}" class="drop-item">Sign up</a>
                         {% endif %}
                     </div>
                 </div>

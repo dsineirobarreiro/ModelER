@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, alogin, logout
 from django.views.generic import TemplateView
 from django.contrib.auth import views
 from django.conf import settings
@@ -24,7 +24,7 @@ class SignupView(TemplateView):
         if form.is_valid():
             user = form.save()
             if user:
-                login(request, user)
+                alogin(request, user)
                 return redirect(request.GET['next'])
         else:
             return render(request, self.template_name, {'form': form})

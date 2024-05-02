@@ -135,3 +135,12 @@ function startSSE() {
             sseData.innerHTML += ev.data;
     };
 }
+
+const logOutForm = document.getElementById("log-out-form");
+
+if (logOutForm) {
+    document.getElementById("log-out").onclick = function() {
+        console.log('a');
+        logOutForm.submit();
+    }
+}

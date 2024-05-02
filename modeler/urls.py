@@ -7,4 +7,5 @@ urlpatterns = [
     path("model/", views.ModelView.as_view(), name="model"),
     path("stream-http/", views.StreamView.as_view(), name="stream-http"),
     path("stream/", views.stream_http, name="stream"),
+    path('modeler/profile', views.ProfileView.as_view(), name='profile')
 ]
