@@ -1,12 +1,11 @@
 {% extends 'modeler/master.html' %}
-
+{% load static %}
 {% block head %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.js"></script>
 
-    {% load static %}
     <script src="{% static 'modeler/module.js' %}"></script>
 {% endblock %}
 
@@ -54,9 +53,9 @@
 
 
         <div class="messages-chat" id="chat">
-            <div class="message">
+            <!--div class="message">
                 <p class="text" id="sse-data"></p>
-            </div>
+            </div-->
         </div>
 
         <div class="flex acenter chat-input">
@@ -77,8 +76,7 @@
         </div>
     </div>
 
-    {% load static %}
-    <script src="{% static 'modeler/form.js' %}" type="module"></script>
+    <script src="{% static 'modeler/model.js' %}"></script>
 
     <script>
 

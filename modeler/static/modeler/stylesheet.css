@@ -67,9 +67,12 @@
     flex: 50%;
 }
 
+.logo-link {
+    text-decoration: none;
+}
+
 #logo-txt {
     color: rgb(0, 0, 0);
-    text-decoration: none;
     float: right;
 }
 
@@ -108,12 +111,12 @@
 }
 
 .profile-btn {
+    margin-right: 40px;
     background-color: transparent;
 }
 
 #profile-icon {
     color: #94007b;
-    margin-right: 40px;
 }
 
 .tab-btn {
@@ -156,7 +159,7 @@
 .dropdown-content {
     display: none;
     position: absolute;
-    right: 0;
+    right: 40px;
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -526,6 +529,19 @@ textarea {
 #mermaid, #plantuml, #jointjs {
     background-color: #ffffff;
 }
+
+.pulse {
+    animation: pulse-animation 2s infinite;
+  }
+  
+  @keyframes pulse-animation {
+    0% {
+      box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
+    }
+  }
 
 .messages-chat {
     padding: 10px 0;

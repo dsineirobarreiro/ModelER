@@ -1,5 +1,5 @@
 {% extends 'modeler/master.html' %}
-
+{% load static %}
 {% block content %}
 
     <div class="intro">
@@ -19,7 +19,6 @@
                 </div>
             </div>
             <div id="intro-right" class="flex-item-right flex flex-center">
-                {% load static %}
                 <img id="intro-img" src="{% static 'modeler/images/intro2.png' %}" alt="">
             </div>
         </div>
@@ -33,13 +32,11 @@
         <div class="spacer-48"></div>
         <div class="flex flex-wrap jeven serv-container">
             <div class="serv-item">
-                {% load static %}
                 <img src="{% static 'modeler/images/service.png' %}" alt="" class="serv-img">
                 <h2 class="title-small">Prompt Text Analysis</h2>
                 <p class="text-medium">Analyze your prompt text to understand the requirements and constraints of your real case scenario for generating the ER diagram.</p>
             </div>
             <div class="serv-item">
-                {% load static %}
                 <img src="{% static 'modeler/images/service2.png' %}" alt="" class="serv-img">
                 <h2 class="title-small">Visualization and Customization</h2>
                 <p class="text-medium">Visualize and customize the generated ER diagram to meet your specific needs and requirements.</p>
@@ -53,7 +50,6 @@
         <p class="text-banner text-center white">Let AI handle your database modeling. Get started today!</p>
     </div>
     <div class="banner bot-banner">
-        {% load static %}
         <img src="{% static 'modeler/images/banner2.png' %}" alt="" class="img-banner">
     </div>
     <div class="footer flex flex-column" style="height: 200px;">

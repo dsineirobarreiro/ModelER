@@ -44,18 +44,18 @@ function sendForm(event) {
     button.disabled = true; 
     input.disabled = true;
     var chat = document.getElementById('chat');
-    chat.innerHTML += `
-    <div class="message">
-        <div class="response">
-            <p class="text">${formData.get('prompt')}</p>
-        </div>
-    </div>
-    `;
     
     fetch(request)
         .then(async (response) => {
             if (response.ok) {
                 //document.getElementById('loader').style.display = 'none';
+                chat.innerHTML += `
+                    <div class="message">
+                        <div class="response">
+                            <p class="text">${formData.get('prompt')}</p>
+                        </div>
+                    </div>
+                `;
                 return response.body;
             }
             throw new Error('Network response was not ok.');
@@ -118,9 +118,9 @@ form.addEventListener('submit', sendForm);
 let eventSource;
 const sseData = document.getElementById('sse-data');
 
-$(document).ready(function(){
+/*$(document).ready(function(){
     startSSE();
-});
+});*/
 
 function startSSE() {
     eventSource = new EventSource('http://localhost:8000/modeler/stream/');

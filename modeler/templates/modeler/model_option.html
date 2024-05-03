@@ -1,0 +1,15 @@
+{% extends 'modeler/master.html' %}
+
+{% block content %}
+        
+    <h1>Articles</h1>
+    <ul>
+    {% for article in object_list %}
+        <a href="{% url 'modeler:model' article.name %}">{{ article.name }}</li>
+    {% empty %}
+        <li>No articles yet.</li>
+    {% endfor %}
+    </ul>
+    
+
+{% endblock %}
