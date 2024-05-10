@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import PromptForm
-from .models import Llm
+from .models import Llm, Token
 
 async def stream_data():
     # Generate data in chunks
@@ -51,28 +51,29 @@ class ModelView(TemplateView):
     template_name = "modeler/model.html"
 
     async def get(self, request, *args, **kwargs):
-        llm = await Llm.objects.aget(name=kwargs.get('llm'))
+        llm = await Llm.objects.filter(name=kwargs.get('llm')).afirst()
         form = self.form_class(initial=self.initial)
         user = await request.auser()
-        return render(request, self.template_name, {'user': user,'form': form, 'llm': llm})
+        token = True
+        if llm and not llm.open_source:
+            if user.is_authenticated:
+                token = await Token.objects.filter(user=user, llm=llm).afirst()
+            else:
+                token = False
+        return render(request, self.template_name, {'user': user,'form': form, 'llm': llm, 'token': token})
 
     async def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         llm = await Llm.objects.aget(name=kwargs.get('llm'))
 
         if form.is_valid():
-            #prompt = form.cleaned_data['prompt']
             print(form.cleaned_data, llm)
             headers = {'ngrok-skip-browser-warning': 'true'}
-            #with httpx.stream("GET", "https://f6a2-104-155-129-7.ngrok-free.app/greet/", headers=headers) as r:
-            #    for text in r.iter_text():
-            #        print(text)
-                #return StreamingHttpResponse(stream_response(r.aiter_lines()), content_type='text/event-stream')
             async def process_response():
                 async with httpx.AsyncClient() as client:
                     async with client.stream(
-                        "GET",
-                        "https://f6a2-104-155-129-7.ngrok-free.app/greet/",
+                        "POST",
+                        "http://localhost:8001/test/",
                         headers=headers,
                     ) as r:
                         async for text in r.aiter_text():
@@ -89,4 +90,12 @@ class ProfileView(TemplateView):
 
     async def get(self, request, *args, **kwargs):
         user = await request.auser()
-        return render(request, self.template_name, {'user': user})
+        section = kwargs.get('section', 'general')
+        active = [
+            'active' if section == 'general' else '',
+            'active' if section == 'settings' else '',
+            'active' if section == 'diagrams' else '',
+            'active' if section == 'tokens' else ''
+        ]
+        active.reverse()
+        return render(request, self.template_name, {'user': user, 'section': section, 'active': active})

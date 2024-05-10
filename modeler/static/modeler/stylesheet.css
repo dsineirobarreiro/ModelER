@@ -590,6 +590,12 @@ textarea {
     }
 }
 
+.model-info {
+    height: calc(100vh - 85px);
+    width: 100%;
+    text-align: center;
+}
+
 .text-small {
     font-size: 12px;
 }

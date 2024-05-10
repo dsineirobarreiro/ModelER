@@ -10,85 +10,116 @@
 {% endblock %}
 
 {% block content %}
-        
-    <div class="grid model-grid">
 
-        <div class="diagram grid">
-            <div class="model-tabs">
-                <button class="tab btn tab-btn" id="defaultOpen" name="jointjs" onclick="openTab('jointjs'); openDiagram(0)">
-                    <span>JointJS</span>
-                </button>
-                <button class="tab btn tab-btn" name="mermaid" onclick="openTab('mermaid'); openDiagram(1)">
-                    <span>Mermaid</span>
-                </button>
-                <button class="tab btn tab-btn" name="plantuml" onclick="openTab('plantuml'); openDiagram(2)">
-                    <span>PlantUml</span>
-                </button>
-                <button class="btn download-btn">
-                    <i class="fa-solid fa-bars fa-2xl"></i>
-                </button>
-    
-                <div class="slide" id="slide"></div>
-            </div>
+    {% if llm %}
 
-            <div id="jointjs" class="tab-content">
-                <div id="paper" class="flex flex-center">
-
-                    <div>Write your prompt to start modeling!</div>
-
-                    <!--div class="flex flex-center" id="loader">
-                        <div class="loader"></div>
-                    </div-->
-    
-                </div>
-            </div>
-
-            <div id="mermaid" class="tab-content">
-                <pre class="mermaid" id="merm-graph"></pre>
-            </div>
-
-            <div id="plantuml" class="tab-content">
-            </div>
-        </div>
-
-
-        <div class="messages-chat" id="chat">
-            <!--div class="message">
-                <p class="text" id="sse-data"></p>
-            </div-->
-        </div>
-
-        <div class="flex acenter chat-input">
-            <form id="promptForm" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="flex flex-center jaround">
-                    <div class="fieldWrapper">
-                        {{ form.prompt.errors }}
-                        {{ form.prompt }}
-                    </div>
-                    <button class="btn send-btn" type="submit">
-                        <i id="send-icon" class="fa-solid fa-arrow-up-long fa-xl"></i>
-                        <span class="tooltiptext">Send text</span>
-                    </button>
-                </div>
-                <input type="hidden" name="url" value={{request.build_absolute_uri}}>
-            </form>
-        </div>
-    </div>
-
-    <script src="{% static 'modeler/model.js' %}"></script>
-
-    <script>
-
-        function openDiagram(index) {
-            var slide;
-            slide = document.getElementById("slide");
+        {% if token %}
             
-            let left = 30 * index;
-            slide.style.left = left.toString() + '%';
-        }
-        
-    </script>
+            <div class="grid model-grid">
+
+                <div class="diagram grid">
+                    <div class="model-tabs">
+                        <button class="tab btn tab-btn" id="defaultOpen" name="jointjs" onclick="openTab('jointjs'); openDiagram(0)">
+                            <span>JointJS</span>
+                        </button>
+                        <button class="tab btn tab-btn" name="mermaid" onclick="openTab('mermaid'); openDiagram(1)">
+                            <span>Mermaid</span>
+                        </button>
+                        <button class="tab btn tab-btn" name="plantuml" onclick="openTab('plantuml'); openDiagram(2)">
+                            <span>PlantUml</span>
+                        </button>
+                        <button class="btn download-btn">
+                            <i class="fa-solid fa-bars fa-2xl"></i>
+                        </button>
+            
+                        <div class="slide" id="slide"></div>
+                    </div>
+
+                    <div id="jointjs" class="tab-content">
+                        <div id="paper" class="flex flex-center">
+
+                            <div>Write your prompt to start modeling!</div>
+
+                            <!--div class="flex flex-center" id="loader">
+                                <div class="loader"></div>
+                            </div-->
+            
+                        </div>
+                    </div>
+
+                    <div id="mermaid" class="tab-content">
+                        <pre class="mermaid" id="merm-graph"></pre>
+                    </div>
+
+                    <div id="plantuml" class="tab-content">
+                    </div>
+                </div>
+
+
+                <div class="messages-chat" id="chat">
+                    <!--div class="message">
+                        <p class="text" id="sse-data"></p>
+                    </div-->
+                </div>
+
+                <div class="flex acenter chat-input">
+                    <form id="promptForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="flex flex-center jaround">
+                            <div class="fieldWrapper">
+                                {{ form.prompt.errors }}
+                                {{ form.prompt }}
+                            </div>
+                            <button class="btn send-btn" type="submit">
+                                <i id="send-icon" class="fa-solid fa-arrow-up-long fa-xl"></i>
+                                <span class="tooltiptext">Send text</span>
+                            </button>
+                        </div>
+                        <input type="hidden" name="url" value={{request.build_absolute_uri}}>
+                    </form>
+                </div>
+            </div>
+
+            <script src="{% static 'modeler/model.js' %}"></script>
+
+            <script>
+
+                function openDiagram(index) {
+                    var slide;
+                    slide = document.getElementById("slide");
+                    
+                    let left = 30 * index;
+                    slide.style.left = left.toString() + '%';
+                }
+                
+            </script>
+
+        {% else %}
+
+            <div class="flex flex-center flex-column model-info">
+                <h2>The model you are trying to use need an API token.</h2>
+                {% if user.is_authenticated %}
+                    <h2>No such token exists in your account.</h2>
+                    <h2>Introduce the token in user settings or switch to a free model</h2>
+                {% else %}
+                    <h2>Please log in or sign up to use this model</h2>
+                {% endif %}
+                <a href="{% url 'modeler:profile' 'tokens' %}"><button class="btn page-btn">User settings</button></a>
+            </div>
+
+        {% endif %}
+    
+    {% else %}
+
+        <div class="flex flex-center flex-column model-info">
+            <h2>The model you are trying to use is not yet provided by this platform.
+                <br>
+                Please use one of the listed in this page
+            </h2>
+            <a href="{% url 'modeler:model-option' %}"><button class="btn page-btn">Models</button></a>
+        </div>
+
+    {% endif %}
 
 
 {% endblock %}

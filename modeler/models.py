@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+
+from users.models import User
 
 # Create your models here.
 class Llm(models.Model):
@@ -8,3 +9,11 @@ class Llm(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+class Token(models.Model):
+    value = models.TextField(verbose_name='API token for the model')
+    llm = models.ForeignKey(Llm, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return self.value
