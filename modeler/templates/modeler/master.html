@@ -37,7 +37,7 @@
                     <div class="dropdown-content">
                         {% if user.is_authenticated %}
                             <a href="{% url 'modeler:profile' %}" class="drop-item bold">{{ user }}</a>
-                            <form action="{% url 'users:logout' %}?next={{request.path}}" method="post" id="log-out-form">
+                            <form action="{% url 'users:logout' %}" method="post" id="log-out-form">
                                 {% csrf_token %}
                                 <a class="drop-item" id="log-out">Log Out</a>
                             </form>

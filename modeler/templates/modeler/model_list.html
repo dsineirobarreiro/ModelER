@@ -5,7 +5,7 @@
     <h1>Articles</h1>
     <ul>
     {% for article in object_list %}
-        <a href="{% url 'modeler:model' article.name %}">{{ article.name }}</li>
+        <a href="{% url 'modeler:chat-create' article.name %}">{{ article.name }}</li>
     {% empty %}
         <li>No articles yet.</li>
     {% endfor %}

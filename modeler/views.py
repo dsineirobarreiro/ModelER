@@ -3,8 +3,10 @@ import httpx
 
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.views.generic import TemplateView, ListView
-from django.shortcuts import render
+from django.views.generic.base import RedirectView
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.conf import settings
 
 from .forms import PromptForm
 from .models import Llm, Token
@@ -41,9 +43,16 @@ async def stream_response(response):
     async for chunk in response:
         yield chunk
 
-class ModelOptionView(ListView):
+class ModelListView(ListView):
     model = Llm
-    template_name = 'modeler/model_option.html'
+    template_name = 'modeler/model_list.html'
+
+class ChatCreateView(RedirectView):
+    pattern_name = 'modeler:model'
+
+    def get_redirect_url(self, *args, **kwargs):
+        print('a')
+        return super().get_redirect_url(*args, **kwargs)
 
 class ModelView(TemplateView):
     form_class = PromptForm
@@ -51,9 +60,11 @@ class ModelView(TemplateView):
     template_name = "modeler/model.html"
 
     async def get(self, request, *args, **kwargs):
+        user = await request.auser()
+        if not user.is_authenticated:
+            return redirect(reverse(f"{settings.LOGIN_URL}") + f'?next={request.path}')
         llm = await Llm.objects.filter(name=kwargs.get('llm')).afirst()
         form = self.form_class(initial=self.initial)
-        user = await request.auser()
         token = True
         if llm and not llm.open_source:
             if user.is_authenticated:
@@ -70,11 +81,12 @@ class ModelView(TemplateView):
             print(form.cleaned_data, llm)
             headers = {'ngrok-skip-browser-warning': 'true'}
             async def process_response():
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(timeout=None) as client:
                     async with client.stream(
                         "POST",
-                        "http://localhost:8001/test/",
+                        "http://localhost:8001/llama2/generate/",
                         headers=headers,
+                        data=form.cleaned_data
                     ) as r:
                         async for text in r.aiter_text():
                             # Work on chunk and then stream it
@@ -90,6 +102,9 @@ class ProfileView(TemplateView):
 
     async def get(self, request, *args, **kwargs):
         user = await request.auser()
+        if not user.is_authenticated:
+            return redirect(reverse(f"{settings.LOGIN_URL}") + f'?next={request.path}')
+        
         section = kwargs.get('section', 'general')
         active = [
             'active' if section == 'general' else '',

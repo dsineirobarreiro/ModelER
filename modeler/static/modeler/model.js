@@ -27,7 +27,7 @@ $("#promptForm").on("submit", function(event) {
     event.preventDefault();
     var formData = new FormData(form);
     console.log(formData.get('prompt'));
-    var url = 'http://localhost:8001/llama/generate/';
+    var url = 'http://localhost:8000/modeler/model/llama2';
     const request = new Request(
         url,
         {
@@ -49,19 +49,56 @@ $("#promptForm").on("submit", function(event) {
         .then(async (response) => {
             if (response.ok) {
                 //document.getElementById('loader').style.display = 'none';
-                chat.innerHTML += `
+                /*chat.innerHTML += `
                     <div class="message">
                         <div class="response">
                             <p class="text">${formData.get('prompt')}</p>
                         </div>
                     </div>
-                `;
+                `;*/
                 return response.body;
             }
             throw new Error('Network response was not ok.');
         })
-        .then(async function(data) {
-            console.log(data)
+        .then(async function(rb) {
+            const reader = rb.getReader();
+
+            let msgId = 1;
+
+            chat.innerHTML += `
+                <div class="message">
+                    <p class="text" id=r-${msgId}></p>
+                </div>
+            `;
+            var msg = document.getElementById('r-1');
+
+            return new ReadableStream({
+                start(controller) {
+                    // The following function handles each data chunk
+                    function push() {
+                        // "done" is a Boolean and value a "Uint8Array"
+                        reader.read().then(({ done, value }) => {
+                            // If there is no more data to read
+                            if (done) {
+                                console.log("done", done);
+                                button.disabled = false; 
+                                input.disabled = false;
+                                controller.close();
+                                return;
+                            }
+                            let token = new TextDecoder().decode(value);
+                            // Get the data and send it to the browser via the controller
+                            controller.enqueue(token);
+                            // Check chunks by logging to the console
+                            //console.log(done, token);
+                            msg.innerText += token;
+                            push();
+                        });
+                    }
+
+                    push();
+                },
+            });
         })
 })
 
