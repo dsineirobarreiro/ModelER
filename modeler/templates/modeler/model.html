@@ -96,19 +96,9 @@
 
             <div class="flex flex-center flex-column model-info">
                 <h2>The model you are trying to use need an API token.</h2>
-                {% if user.is_authenticated %}
-                    <h2>No such token exists in your account.</h2>
-                    <h2>Introduce the token in user settings or switch to a free model</h2>
-                    <a href="{% url 'modeler:profile' 'tokens' %}"><button class="btn page-btn">User settings</button></a>
-                {% else %}
-                    <h2>Please log in or sign up to use this model</h2>
-                    <div class="spacer-16"></div>
-                    <div class="flex">
-                        <a href="{% url 'users:login' %}?next={{request.path}}"><button class="btn page-btn">Log in</button></a>
-                        <div class="spacer-16"></div>
-                        <a href="{% url 'users:signup' %}?next={{request.path}}"><button class="btn page-btn">Sign up</button></a>
-                    </div>
-                {% endif %}
+                <h2>No such token exists in your account.</h2>
+                <h2>Introduce the token in user settings or switch to a free model</h2>
+                <a href="{% url 'modeler:profile' 'tokens' %}"><button class="btn page-btn">User settings</button></a>
             </div>
 
         {% endif %}

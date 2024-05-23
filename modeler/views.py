@@ -1,13 +1,14 @@
 import asyncio
 import httpx
 
-from django.http import StreamingHttpResponse
-from django.views.generic import TemplateView, ListView
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.views.generic import TemplateView, ListView, FormView
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.conf import settings
-from asgiref.sync import sync_to_async
+from django.contrib.auth.mixins import LoginRequiredMixin
+from asgiref.sync import async_to_sync
 
 from .forms import PromptForm
 from .models import Llm, Token, Chat
@@ -34,11 +35,6 @@ class StreamView(TemplateView):
 class IndexView(TemplateView):
     template_name = "modeler/index.html"
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        return render(request, self.template_name, {'user': user})
-
-
 async def stream_response(response):
     # Generate data in chunks
     async for chunk in response:
@@ -48,23 +44,13 @@ class ModelListView(ListView):
     model = Llm
     template_name = 'modeler/model_list.html'
 
-class DiagramView(TemplateView):
+class DiagramView(LoginRequiredMixin, TemplateView):
     template_name = 'modeler/diagram.html'
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            return redirect(reverse(f"{settings.LOGIN_URL}") + f'?next={request.path}')
-        llm = await Llm.objects.filter(name=kwargs.get('llm')).afirst()
-        return render(request, self.template_name, {'user': user, 'llm': llm})
-
-    async def post(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            pass #devolver invalid request o algo
-        diagram = Chat(user=user)
-        await diagram.asave()
-        return redirect(reverse(f'modeler:model', kwargs={'llm': 'llama2', 'pk': diagram.pk}))
+    def post(self, request, *args, **kwargs):
+        diagram = Chat(user=request.user)
+        diagram.save()
+        return redirect(reverse(f'modeler:model', kwargs={'llm': 'llama2', 'title': diagram}))
 
         
 
@@ -80,61 +66,53 @@ class CreateDiagramView(RedirectView):
         kwargs['pk'] = diagram.pk
         return super().get_redirect_url(*args, **kwargs)
 
-class ModelView(TemplateView):
+
+class ModelView(LoginRequiredMixin, FormView):
     form_class = PromptForm
     initial = {"key": "value"}
     template_name = "modeler/model.html"
-    
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            return redirect(reverse(f"{settings.LOGIN_URL}") + f'?next={request.path}')
-        print(type(kwargs.get('llm')))
-        llm = await Llm.objects.filter(name=kwargs.get('llm')).afirst()
-        form = self.form_class(initial=self.initial)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['llm'] = self.kwargs['llm']
         token = True
-        if llm and not llm.open_source:
-            if user:
-                token = await Token.objects.filter(user=user, llm=llm).afirst()
-            else:
-                token = False
-        return render(request, self.template_name, {'user': user,'form': form, 'llm': llm, 'token': token})
+        if not context['llm'].open_source:
+            token = Token.objects.filter(user=self.request.user, llm=context['llm']).first()
+        context['token'] = True if token else False
+        return context
 
-    async def post(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            pass #devolver invalid request o algo
+    def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-        llm = await Llm.objects.aget(name=kwargs.get('llm'))
+        llm = kwargs.get('llm')
 
         if form.is_valid():
             print(form.cleaned_data, llm)
             headers = {'ngrok-skip-browser-warning': 'true'}
-            async def process_response():
-                async with httpx.AsyncClient(timeout=None) as client:
-                    async with client.stream(
-                        "POST",
-                        "http://localhost:8001/llama2/generate/",
-                        headers=headers,
-                        data=form.cleaned_data
-                    ) as r:
-                        async for text in r.aiter_text():
-                            # Work on chunk and then stream it
-                            yield text
+            
+            def generate(headers, form):
+                def process_response():
+                    with httpx.Client(timeout=None) as client:
+                        with client.stream(
+                            "POST",
+                            "http://localhost:8001/llama2/generate/",
+                            headers=headers,
+                            data=form
+                        ) as r:
+                            for text in r.iter_text():
+                                # Work on chunk and then stream it
+                                yield text
 
+                    
+                return StreamingHttpResponse(
+                    process_response()
+                )
                 
-            return StreamingHttpResponse(
-                process_response()
-            )
+            return generate(headers, form.cleaned_data)
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'modeler/profile.html'
 
-    async def get(self, request, *args, **kwargs):
-        user = await request.auser()
-        if not user.is_authenticated:
-            return redirect(reverse(f"{settings.LOGIN_URL}") + f'?next={request.path}')
+    def get(self, request, *args, **kwargs):
         section = kwargs.get('section', 'general')
         active = [
             'active' if section == 'general' else '',
@@ -143,4 +121,4 @@ class ProfileView(TemplateView):
             'active' if section == 'tokens' else ''
         ]
         active.reverse()
-        return render(request, self.template_name, {'user': user, 'section': section, 'active': active})
+        return render(request, self.template_name, {'section': section, 'active': active})

@@ -1,14 +1,17 @@
-from django.urls import path
+from django.urls import path, register_converter
 
-from . import views
+from . import views, converters
+
+register_converter(converters.LlmConverter, "model")
+register_converter(converters.DiagramConverter, "diagram")
 
 app_name = "modeler"
 urlpatterns = [
     path("", views.IndexView.as_view(), name='index'),
     path("model/", views.ModelListView.as_view(), name="model-list"),
-    path("model/<str:llm>", views.DiagramView.as_view(), name="diagram"),
-    path("model/<str:llm>/new", views.CreateDiagramView.as_view(), name="new_diagram"),
-    path("model/<str:llm>/<int:pk>", views.ModelView.as_view(), name="model"),
+    path("model/<model:llm>", views.DiagramView.as_view(), name="diagram"),
+    path("model/<model:llm>/new", views.CreateDiagramView.as_view(), name="new_diagram"),
+    path("model/<model:llm>/<diagram:title>", views.ModelView.as_view(), name="model"),
     path("stream-http/", views.StreamView.as_view(), name="stream-http"),
     path("stream/", views.stream_http, name="stream"),
     path('profile/', views.ProfileView.as_view(), name='profile'),

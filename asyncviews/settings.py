@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",
+    #"daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = "asyncviews.asgi.application"
+ASGI_APPLICATION = "asyncviews.wsgi.application"
 
 
 # Database

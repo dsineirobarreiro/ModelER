@@ -1,6 +1,8 @@
 let input = document.querySelector("#id_prompt");
 let button = document.querySelector(".send-btn");
 
+let msgId = 0;
+
 button.disabled = true; //setting button state to disabled
 
 
@@ -27,7 +29,7 @@ $("#promptForm").on("submit", function(event) {
     event.preventDefault();
     var formData = new FormData(form);
     console.log(formData.get('prompt'));
-    var url = 'http://localhost:8000/modeler/model/llama2';
+    var url = 'http://localhost:8000/modeler/model/llama2/22'; //Pasarle el id del chat
     const request = new Request(
         url,
         {
@@ -44,6 +46,14 @@ $("#promptForm").on("submit", function(event) {
     button.disabled = true; 
     input.disabled = true;
     var chat = document.getElementById('chat');
+
+    chat.innerHTML += `
+                    <div class="message">
+                        <div class="response">
+                            <p class="text" id="r-${msgId}">${formData.get('prompt')}</p>
+                        </div>
+                    </div>
+                `;
     
     fetch(request)
         .then(async (response) => {
@@ -57,20 +67,24 @@ $("#promptForm").on("submit", function(event) {
                     </div>
                 `;*/
                 return response.body;
+            }else{
+                var msg = document.getElementById('r-' + msgId);
+                msg.className += ' error'
             }
-            throw new Error('Network response was not ok.');
         })
         .then(async function(rb) {
             const reader = rb.getReader();
 
-            let msgId = 1;
+            msgId++;
 
             chat.innerHTML += `
                 <div class="message">
                     <p class="text" id=r-${msgId}></p>
                 </div>
             `;
-            var msg = document.getElementById('r-1');
+            var msg = document.getElementById('r-' + msgId);
+
+            msgId++;
 
             return new ReadableStream({
                 start(controller) {
@@ -99,6 +113,7 @@ $("#promptForm").on("submit", function(event) {
                     push();
                 },
             });
+
         })
 })
 
@@ -150,8 +165,6 @@ function sendForm(event) {
                 }
             }*/
             const reader = rb.getReader();
-
-            let msgId = 1;
 
             chat.innerHTML += `
                 <div class="message">
