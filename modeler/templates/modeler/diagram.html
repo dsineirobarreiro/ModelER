@@ -1,0 +1,15 @@
+{% extends 'modeler/master.html' %}
+
+{% block content %}
+        
+    <h1>{{llm}}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn page-btn">New diagram</button>
+    </form>
+    <a>
+        <button class="btn page-btn">Open diagram</button>
+    </a>
+    
+
+{% endblock %}

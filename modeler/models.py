@@ -17,3 +17,21 @@ class Token(models.Model):
 
     def __str__(self) -> str:
         return self.value
+    
+class Chat(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(verbose_name='name of the diagram', max_length=64, default='Untitled diagram', unique=True)
+    created_on = models.DateTimeField(verbose_name='date when the chat was created', auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.title
+
+class Message(models.Model):
+    index = models.IntegerField(verbose_name='message id inside the chat')
+    content = models.TextField()
+    timestamp = models.DateTimeField(verbose_name='time when the message was created', auto_now_add=True)
+    choices = {
+        'U': 'user',
+        'A': 'assistant'
+    }
+    origin = models.CharField(max_length=1, choices=choices)
