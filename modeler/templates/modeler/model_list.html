@@ -2,14 +2,22 @@
 
 {% block content %}
         
-    <h1>Articles</h1>
-    <ul>
-    {% for article in object_list %}
-        <a href="{% url 'modeler:diagram' article.name %}">{{ article.name }}</li>
-    {% empty %}
-        <li>No articles yet.</li>
-    {% endfor %}
-    </ul>
-    
+    <h1 class="m-3">Models</h1>
+    <div class="row m-3">
+        {% for model in object_list %}
+        <div class="col-sm-6 mb-3 mb-sm-0">
+          <div class="card">
+            <div class="card-header">
+                <h2>{{ model.name }}</h2>
+            </div>
+            <div class="card-body">
+              <a href="{% url 'modeler:diagram_selection' model.name %}" class="btn btn-primary">Use this model</a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+            <li>No articles yet.</li>
+        {% endfor %}
+      </div>    
 
 {% endblock %}

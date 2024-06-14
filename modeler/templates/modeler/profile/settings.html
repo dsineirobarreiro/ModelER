@@ -1,0 +1,48 @@
+{% extends 'modeler/profile/index.html' %}
+{% load static %}
+
+{% block profile %}
+              
+    <div id="user-setting" class="profile-tab-content tab-content">
+        <h3>User settings</h3>
+ 
+            <form method="post" id="form">
+                {% csrf_token %}
+                <fieldset id="change-form" disabled>
+                    {% for field in form %}
+                        {% if field.html_name != 'password' %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            <input type="text" id="{{ field.id_for_label }}" name="{{field.html_name}}" class="form-control" value="{{ field.value }}">
+                            <div id="{{field.html_name}}HelpBlock" class="form-text">{{ field.help_text }}</div>
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <div class="form-label">{{ field.label }}</div>
+                            <div id="{{field.html_name}}HelpBlock" class="form-text">
+                                For security reasons, password changes are done in <a href="{% url 'users:password_change' %}">this form</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </fieldset>
+              </form>
+              <button id="edit" class="btn btn-primary mt-3">Edit</button>
+    </div>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let edit = document.querySelector('#edit');
+            let fields = document.querySelector('#change-form');
+            let form = document.querySelector('#form');
+
+            edit.addEventListener("click", () => {
+                fields.disabled = false;
+            });
+        });
+
+    </script>
+            
+{% endblock %}

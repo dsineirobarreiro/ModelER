@@ -1,5 +1,4 @@
-from .models import Llm, Chat
-from asgiref.sync import async_to_sync
+from .models import Llm, Chat, Token
 
 class LlmConverter:
     regex = "[a-zA-Z0-9]+"
@@ -18,3 +17,13 @@ class DiagramConverter:
 
     def to_url(self, value):
         return value.pk
+
+class TokenConverter:
+    regex = ".+"
+
+    def to_python(self, value):
+        return Token.objects.filter(pk=value).first()
+
+    def to_url(self, value):
+        return value.pk
+    

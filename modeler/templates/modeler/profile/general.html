@@ -1,0 +1,26 @@
+{% extends 'modeler/profile/index.html' %}
+{% load static %}
+{% block profile %}
+        
+    <div id="gen-info" class="profile-tab-content tab-content">
+        <h2>General information</h2>
+        <div class="flex wrap card-container">
+            <div class="gen-card">
+                <div>User settings</div>
+                <h3>User information</h3>
+                <div>You can edit your name, email address, account password and language.</div>
+                <div class="gen-grid">
+                    <div class="line"></div>
+                    <span class="grid-sec">NOMBRE</span><span>{{ user }}</span>
+                    <div class="line"></div>
+                    <span class="grid-sec">EMAIL</span><span>{{ user.email }}</span>
+                    <div class="line"></div>
+                    <span class="grid-sec">PASSWORD</span><span>*************</span>
+                    <div class="line"></div>
+                </div>
+                <button class="card-btn" onclick="openTab('user-setting')">See more on User settings</button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

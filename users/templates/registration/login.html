@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>ModelER</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% load static %}
-    <link rel="icon" type="image/png" href="{% static 'modeler/images/logo.png' %}">
-	{% load static %}
-	<link rel="stylesheet" href="{% static 'modeler/login.css' %}">
-	{% load static %}
-	<link rel="stylesheet" href="{% static 'modeler/stylesheet.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script src="https://kit.fontawesome.com/902453c4f7.js" crossorigin="anonymous"></script>
-</head>
+{% extends 'registration/master.html' %}
+{% load static %}
+{% block content %}
 
-<body>
     <form method="POST" enctype="multipart/form-data">
 		{% csrf_token %}
 		<div class="login-container">
@@ -54,5 +41,5 @@
 			</div>
 		</div>
 	</form>
-</body>
-</html>
+
+{% endblock %}

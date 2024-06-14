@@ -1,0 +1,99 @@
+{% extends 'modeler/profile/index.html' %}
+{% load static %}
+
+{% block profile %}
+              
+    <div id="diagrams" class="profile-tab-content tab-content">
+        <h3>Diagramas</h3>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xxl-6 g-4">
+            {% for diagram in diagramset %}
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{% url 'modeler:diagram' diagram %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="title" value="{{diagram}}" class="card-title form-control" data-diagram-title="{{diagram.pk}}" disabled/>
+                        </form>
+                        <a href="{% url 'modeler:model' 'llama2' diagram %}" class="btn btn-primary">Open</a>
+                        <button class="btn btn-primary edit" data-diagram-btn="{{diagram.pk}}">Edit</button>
+                    </div>
+                    <div class="card-footer text-body-secondary">
+                    {{ diagram.last_modified }}
+                    </div>
+                </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+
+        let titles, buttons;
+
+        function submitForm(form, id) {
+            const url = window.location.origin + '/modeler/diagram/' + id + '/edit';
+            console.log(form);
+            var formData = new FormData(form);
+            const request = new Request(
+                url,
+                {
+                    method: 'POST',
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    body: formData,
+                }
+            );
+            fetch(request)
+                .then(async (response) => {
+                    if (response.ok) {
+                        console.log('Exito');
+                    }else{
+                        console.log('error');
+                    }
+                })
+        }
+
+        function addBlurEvent(elem){
+
+            const form = elem.parentNode;
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+            })
+
+            elem.addEventListener("blur", (event) => {
+                submitForm(form, elem.getAttribute('data-diagram-title'));
+                elem.disabled = true;
+            });
+
+            elem.addEventListener("keypress", (event) => {
+                if (event.key === "Enter") {
+                    elem.blur();
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            buttons = document.getElementsByClassName("edit");
+            titles = document.getElementsByClassName('card-title');
+
+            Array.prototype.forEach.call(titles, function(elem) {
+                addBlurEvent(elem);
+            });
+
+            Array.prototype.forEach.call(buttons, function(elem) {
+                elem.addEventListener("click", () => {
+                    let title = document.querySelector('[data-diagram-title="' + elem.getAttribute('data-diagram-btn') + '"]');
+                    title.disabled = false;
+                    title.select();
+                    title.focus();
+                });
+            });
+        });
+
+    </script>
+
+{% endblock %}

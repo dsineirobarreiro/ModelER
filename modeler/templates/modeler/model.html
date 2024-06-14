@@ -7,6 +7,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.js"></script>
 
     <script src="{% static 'modeler/module.js' %}"></script>
+    <script src="{% static 'modeler/bundle.js' %}" type="module"></script>
+    <script src="{% static 'modeler/model.js' %}" type="module"></script>
+    <script src="{% static 'modeler/plantuml.js' %}" type="module"></script>
+    <script src="{% static 'modeler/mermaid.js' %}" type="module"></script>
+    <script src="https://unpkg.com/gojs"></script>
+    <script src="{% static 'modeler/extensions/Themes.js' %}"></script>
+    <script src="{% static 'modeler/gojs.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -15,12 +22,38 @@
 
         {% if token %}
             
-            <div class="grid model-grid">
+            <div class="grid model-grid {{MEDIA_ROOT}}">
 
-                <div class="diagram grid">
-                    <div class="model-tabs">
-                        <button class="tab btn tab-btn" id="defaultOpen" name="jointjs" onclick="openTab('jointjs'); openDiagram(0)">
-                            <span>JointJS</span>
+                <div class="diagram grid" id="diagram" data-diagram-id="{{diagram.pk}}">
+                    <div class="container">
+                        <div class="row">
+                            <div class="nav nav-underline nav-fill col-11" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-gojs-tab" data-bs-toggle="tab" data-bs-target="#nav-gojs" type="button" role="tab" aria-controls="nav-gojs" aria-selected="true">GoJS</button>
+                                <button class="nav-link" id="nav-mermaid-tab" data-bs-toggle="tab" data-bs-target="#nav-mermaid" type="button" role="tab" aria-controls="nav-mermaid" aria-selected="false">Mermaid</button>
+                                <button class="nav-link" id="nav-plantuml-tab" data-bs-toggle="tab" data-bs-target="#nav-plantuml" type="button" role="tab" aria-controls="nav-plantuml" aria-selected="false">PlantUML</button>
+                            </div>
+    
+                            <div class="dropend col-1">
+                                <button class="btn dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-bars fa-2xl"></i>
+                                </button>
+                                    <ul class="dropdown-menu" id="download-menu">
+                                        {% if files %}
+                                            {% for file in files %}
+                                            <li><a class="dropdown-item" id="plantuml-{{file.format.value}}" href="/media/{{file.file}}" download>Download {{file.get_software_display}} as {{file.format.value}}</a></li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li><div class="p-2">No files yet</div></li>
+                                        {% endif %}
+                                    </ul>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                    <!--div class="model-tabs">
+                        <button class="tab btn tab-btn" id="defaultOpen" name="gojs" onclick="openTab('gojs'); openDiagram(0)">
+                            <span>GoJS</span>
                         </button>
                         <button class="tab btn tab-btn" name="mermaid" onclick="openTab('mermaid'); openDiagram(1)">
                             <span>Mermaid</span>
@@ -28,23 +61,41 @@
                         <button class="tab btn tab-btn" name="plantuml" onclick="openTab('plantuml'); openDiagram(2)">
                             <span>PlantUml</span>
                         </button>
-                        <button class="btn download-btn">
+                        <button class="btn dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-bars fa-2xl"></i>
                         </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Download PlantUML as PNG</a></li>
+                          </ul>
             
                         <div class="slide" id="slide"></div>
-                    </div>
+                    </div-->
 
-                    <div id="jointjs" class="tab-content">
-                        <div id="paper" class="flex flex-center">
-
-                            <div>Write your prompt to start modeling!</div>
-
-                            <!--div class="flex flex-center" id="loader">
-                                <div class="loader"></div>
-                            </div-->
-            
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-gojs" role="tabpanel" aria-labelledby="nav-gojs-tab" tabindex="0">
+                            <div id="myDiagramDiv" style="height: 95%;"></div>
+                            <select id="theme" onchange="changeTheme()">
+                                <option value="system">System</option>
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                            </select>
                         </div>
+                        <div class="tab-pane fade" id="nav-mermaid" role="tabpanel" aria-labelledby="nav-mermaid-tab" tabindex="1">
+                            <pre class="mermaid" id="merm-graph"></pre>
+                        </div>
+                        <div class="tab-pane fade" id="nav-plantuml" role="tabpanel" aria-labelledby="nav-plantuml-tab" tabindex="2">
+                            <img src="" id="plant-diagram">
+                        </div>
+                        <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">...</div>
+                    </div>
+                    <!--
+                    <div id="gojs" class="tab-content">
+                        <div id="myDiagramDiv" style="height: 95%;"></div>
+                        <select id="theme" onchange="changeTheme()">
+                            <option value="system">System</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
                     </div>
 
                     <div id="mermaid" class="tab-content">
@@ -53,12 +104,26 @@
 
                     <div id="plantuml" class="tab-content">
                     </div>
+                -->
                 </div>
+                
 
 
-                <div class="messages-chat" id="chat">
-                    
+                <div class="messages-chat" id="chat" data-last-index="{{message_list|length}}">
+                    {% for msg in message_list %}
+                    <div class="message">
+                        {% if msg.origin == 'U' %}
+                            <div class="response">
+                                <p class="text" id="r-{{msg.index}}">{{msg}}</p>
+                            </div>
+                        {% else %}
+                            <p class="text" id="r-{{msg.index}}">{{msg}}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
+                
+                
 
                 <div class="flex acenter chat-input">
                     <form id="promptForm" method="post" enctype="multipart/form-data">
@@ -68,17 +133,13 @@
                                 {{ form.prompt.errors }}
                                 {{ form.prompt }}
                             </div>
-                            <button class="btn send-btn" type="submit">
+                            <button class="btn btn-primary py-3 px-3" type="submit" id="send">
                                 <i id="send-icon" class="fa-solid fa-arrow-up-long fa-xl"></i>
-                                <span class="tooltiptext">Send text</span>
                             </button>
                         </div>
-                        <!--input type="hidden" name="url" value={{request.build_absolute_uri}}-->
                     </form>
                 </div>
             </div>
-
-            <script src="{% static 'modeler/model.js' %}"></script>
 
             <script>
 

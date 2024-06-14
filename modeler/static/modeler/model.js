@@ -1,7 +1,15 @@
-let input = document.querySelector("#id_prompt");
-let button = document.querySelector(".send-btn");
+import { createMermaidDiagram } from './mermaid.js'
+import { createUmlDiagram } from './plantUml.js';
+//import { init } from './gojs';
 
-let msgId = 0;
+let input = document.querySelector("#id_prompt");
+let button = document.querySelector("#send");
+let chat = document.querySelector('#chat');
+export const dgram = document.querySelector('#diagram');
+
+let msgId = parseInt(chat.getAttribute('data-last-index')) + 1;
+
+let diagram = [];
 
 button.disabled = true; //setting button state to disabled
 
@@ -29,7 +37,7 @@ $("#promptForm").on("submit", function(event) {
     event.preventDefault();
     var formData = new FormData(form);
     console.log(formData.get('prompt'));
-    var url = 'http://localhost:8000/modeler/model/llama2/22'; //Pasarle el id del chat
+    var url = window.location.href;
     const request = new Request(
         url,
         {
@@ -45,7 +53,6 @@ $("#promptForm").on("submit", function(event) {
     //setting inputs state to disabled
     button.disabled = true; 
     input.disabled = true;
-    var chat = document.getElementById('chat');
 
     chat.innerHTML += `
                     <div class="message">
@@ -58,14 +65,6 @@ $("#promptForm").on("submit", function(event) {
     fetch(request)
         .then(async (response) => {
             if (response.ok) {
-                //document.getElementById('loader').style.display = 'none';
-                /*chat.innerHTML += `
-                    <div class="message">
-                        <div class="response">
-                            <p class="text">${formData.get('prompt')}</p>
-                        </div>
-                    </div>
-                `;*/
                 return response.body;
             }else{
                 var msg = document.getElementById('r-' + msgId);
@@ -95,6 +94,8 @@ $("#promptForm").on("submit", function(event) {
                             // If there is no more data to read
                             if (done) {
                                 console.log("done", done);
+                                createMermaidDiagram(msg.innerText);
+                                createUmlDiagram(msg.innerText);
                                 button.disabled = false; 
                                 input.disabled = false;
                                 controller.close();
@@ -103,6 +104,7 @@ $("#promptForm").on("submit", function(event) {
                             let token = new TextDecoder().decode(value);
                             // Get the data and send it to the browser via the controller
                             controller.enqueue(token);
+                            diagram.push(token);
                             // Check chunks by logging to the console
                             //console.log(done, token);
                             msg.innerText += token;
@@ -116,90 +118,6 @@ $("#promptForm").on("submit", function(event) {
 
         })
 })
-
-function sendForm(event) {
-    event.preventDefault();
-    //document.getElementById('loader').style.visibility = 'visible';
-    var formData = new FormData(form);
-    console.log(formData.get('prompt'));
-    var url = formData.get("url");
-    const request = new Request(
-        url,
-        {
-            method: 'POST',
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                'X-CSRFToken': csrfToken,
-            },
-            body: formData,
-        }
-    );
-    document.getElementById('promptForm').reset();
-    //setting inputs state to disabled
-    button.disabled = true; 
-    input.disabled = true;
-    var chat = document.getElementById('chat');
-    
-    fetch(request)
-        .then(async (response) => {
-            if (response.ok) {
-                //document.getElementById('loader').style.display = 'none';
-                chat.innerHTML += `
-                    <div class="message">
-                        <div class="response">
-                            <p class="text">${formData.get('prompt')}</p>
-                        </div>
-                    </div>
-                `;
-                return response.body;
-            }
-            throw new Error('Network response was not ok.');
-        })
-        .then(async function(rb) {
-            /*let measurementsReceived = 0;
-            for await (const measurement of parseJsonStream(data)) {
-                measurementsReceived++;
-                // To prevent the console from flooding we only show 1 in every 100 measurements
-                for (const [key, value] of Object.entries(measurement)) {
-                    console.log(`${key}: ${value}`);
-                }
-            }*/
-            const reader = rb.getReader();
-
-            chat.innerHTML += `
-                <div class="message">
-                    <p class="text" id=r-${msgId}></p>
-                </div>
-            `;
-            var msg = document.getElementById('r-1');
-
-            return new ReadableStream({
-                start(controller) {
-                    // The following function handles each data chunk
-                    function push() {
-                        // "done" is a Boolean and value a "Uint8Array"
-                        reader.read().then(({ done, value }) => {
-                            // If there is no more data to read
-                            if (done) {
-                                console.log("done", done);
-                                controller.close();
-                                return;
-                            }
-                            let token = new TextDecoder().decode(value);
-                            // Get the data and send it to the browser via the controller
-                            controller.enqueue(token);
-                            // Check chunks by logging to the console
-                            //console.log(done, token);
-                            msg.innerText += token;
-                            push();
-                        });
-                    }
-
-                    push();
-                },
-            });
-        })
-}
 
 async function *parseJsonStream(readableStream) {
     for await (const line of readLines(readableStream.getReader())) {
@@ -241,26 +159,40 @@ function readChunks(reader) {
     };
 }
 
-//// Events
-//form.addEventListener('submit', sendForm);
-
-let eventSource;
-const sseData = document.getElementById('sse-data');
-
-/*$(document).ready(function(){
-    var input = $("<input>")
-                    .attr("type", "hidden")
-                    .attr("name", "greet").val("Hi, how are you?\n");
-    $("#promtpForm").append($(input));
-    $("#promptForm").trigger("submit");
-});*/
-
-function startSSE() {
-    eventSource = new EventSource('http://localhost:8000/modeler/stream/');
-    eventSource.onmessage = function (ev) {
-        if (ev.data == "$")
-            eventSource.close();
-        else
-            sseData.innerHTML += ev.data;
-    };
+export function saveFile(data, format, type){
+    const id = dgram.getAttribute('data-diagram-id');
+    const url = window.location.origin + '/modeler/diagram/' + id + '/' + format
+    let formData = new FormData();
+    formData.append('file', data, type + '_' + id + '.' + format);
+    formData.append('software', type[0])
+    const request = new Request(
+        url,
+        {
+            method: 'POST',
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                'X-CSRFToken': csrfToken,
+            },
+            body: formData,
+        }
+    );
+    fetch(request)
+        .then((response) => {
+            if (response.ok) {
+                let item = document.querySelector('#' + type.toLowerCase() + '-' + format)
+                if (item == null){
+                    let menu = document.querySelector('#download-menu');
+                    let html = `
+                        <li>
+                            <a class="dropdown-item" id="${type.toLowerCase()}-${format}" href="/media/modeler/diagrams/${type}_${id}.${format}" download>
+                                Download ${type} as ${format}
+                            </a>
+                        </li>
+                    `;
+    
+                    menu.innerHTML += html;
+                }
+            }
+            else throw new Error('Network response was not ok.');
+        })
 }

@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.views.generic import TemplateView
 from django.contrib.auth import views
 from django.conf import settings
@@ -30,3 +32,10 @@ class SignupView(TemplateView):
                 return redirect(request.GET['next'])
         else:
             return render(request, self.template_name, {'form': form, 'next': next})
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name='registration/password_change.html'
+    success_url = reverse_lazy('users:password_change_done')
+
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name='registration/password_done.html'

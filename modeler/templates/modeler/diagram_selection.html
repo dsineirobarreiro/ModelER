@@ -1,0 +1,15 @@
+{% extends 'modeler/master.html' %}
+
+{% block content %}
+        
+    <h1>{{llm}}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary m-1">New diagram</button>
+    </form>
+    <a href="{% url 'modeler:profile_diagrams' %}" class="m-1">
+        <button class="btn btn-primary">Open diagram</button>
+    </a>
+    
+
+{% endblock %}

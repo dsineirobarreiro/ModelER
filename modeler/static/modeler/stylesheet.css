@@ -14,6 +14,25 @@
     font-family: Barlow;
 }
 
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+main {
+    flex: 1;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
 .bold {
     font-weight: bold;
 }
@@ -443,7 +462,7 @@ textarea {
 
 .grid {
     display: grid;
-    height: calc(100vh - 85px); /*esto no me termina de convencer*/
+    height: 100%;
     max-width: 100vw;
 }
 
@@ -576,6 +595,10 @@ textarea {
 
 .error {
     background-color: red;
+}
+
+#id_prompt {
+    resize: none;
 }
       
 @keyframes rotation {

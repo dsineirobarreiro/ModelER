@@ -7,11 +7,5 @@ from .managers import CustomUserManager
 
 
 class User(AbstractUser):
-    email = models.EmailField(_("email address"), unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-
-    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
