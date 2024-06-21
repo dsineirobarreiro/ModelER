@@ -1,6 +1,6 @@
 import { createMermaidDiagram } from './mermaid.js'
 import { createUmlDiagram } from './plantUml.js';
-//import { init } from './gojs';
+import { init } from './gojs.js';
 
 let input = document.querySelector("#id_prompt");
 let button = document.querySelector("#send");
@@ -85,6 +85,9 @@ $("#promptForm").on("submit", function(event) {
 
             msgId++;
 
+            let menu = document.querySelector('#download-menu');
+            menu.innerHTML = '';
+
             return new ReadableStream({
                 start(controller) {
                     // The following function handles each data chunk
@@ -94,8 +97,10 @@ $("#promptForm").on("submit", function(event) {
                             // If there is no more data to read
                             if (done) {
                                 console.log("done", done);
+
                                 createMermaidDiagram(msg.innerText);
                                 createUmlDiagram(msg.innerText);
+                                init(msg.innerText);
                                 button.disabled = false; 
                                 input.disabled = false;
                                 controller.close();
@@ -164,7 +169,7 @@ export function saveFile(data, format, type){
     const url = window.location.origin + '/modeler/diagram/' + id + '/' + format
     let formData = new FormData();
     formData.append('file', data, type + '_' + id + '.' + format);
-    formData.append('software', type[0])
+    formData.append('tool', type[0])
     const request = new Request(
         url,
         {
@@ -179,20 +184,26 @@ export function saveFile(data, format, type){
     fetch(request)
         .then((response) => {
             if (response.ok) {
-                let item = document.querySelector('#' + type.toLowerCase() + '-' + format)
-                if (item == null){
-                    let menu = document.querySelector('#download-menu');
-                    let html = `
-                        <li>
-                            <a class="dropdown-item" id="${type.toLowerCase()}-${format}" href="/media/modeler/diagrams/${type}_${id}.${format}" download>
-                                Download ${type} as ${format}
-                            </a>
-                        </li>
-                    `;
-    
-                    menu.innerHTML += html;
-                }
+                return response.json()
             }
             else throw new Error('Network response was not ok.');
+        })
+        .then((data) => {
+            let item = document.querySelector('#' + data.tool.toLowerCase() + '-' + data.format)
+            if (item == null){
+                let menu = document.querySelector('#download-menu');
+                let html = `
+                    <li>
+                        <a class="dropdown-item" id="${data.tool.toLowerCase()}-${data.format}" href="${data.path}" download>
+                            Download ${data.tool} as ${data.format}
+                        </a>
+                    </li>
+                `;
+
+                menu.innerHTML += html;
+            }
+            else{
+                item.setAttribute('href', data.path)
+            }
         })
 }

@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Chat, File, Token
+from .models import Diagram, File, Token
 
 
 class PromptForm(forms.Form):
@@ -8,7 +8,7 @@ class PromptForm(forms.Form):
 
 class DiagramForm(forms.ModelForm):
     class Meta:
-        model = Chat
+        model = Diagram
         fields = ['title']
 
 class TokenForm(forms.ModelForm):
@@ -19,4 +19,4 @@ class TokenForm(forms.ModelForm):
 class FileForm(forms.ModelForm):
     class Meta:
         model = File
-        fields = ['file', 'software']
+        fields = ['file', 'tool']

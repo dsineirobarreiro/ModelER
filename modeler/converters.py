@@ -1,4 +1,4 @@
-from .models import Llm, Chat, Token
+from .models import Llm, Diagram, Token
 
 class LlmConverter:
     regex = "[a-zA-Z0-9]+"
@@ -13,7 +13,7 @@ class DiagramConverter:
     regex = "[a-zA-Z0-9]+"
 
     def to_python(self, value):
-        return Chat.objects.filter(pk=value).first()
+        return Diagram.objects.filter(pk=value).first()
 
     def to_url(self, value):
         return value.pk

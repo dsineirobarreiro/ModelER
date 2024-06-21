@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 from users.models import User
 
@@ -18,14 +20,22 @@ class Token(models.Model):
     def __str__(self) -> str:
         return self.value
     
-class Chat(models.Model):
+class Diagram(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(verbose_name='name of the diagram', max_length=64, default='Untitled diagram')
+    title = models.CharField(verbose_name='name of the diagram', max_length=64, blank=True)
+    elements = models.TextField(verbose_name='Data model elements', null=True)
     created_on = models.DateTimeField(verbose_name='date when the chat was created', auto_now_add=True, editable=False)
     last_modified = models.DateTimeField(verbose_name='last time the diagram was accessed', auto_now=True)
 
     def __str__(self) -> str:
         return self.title
+
+@receiver(pre_save, sender=Diagram)
+def my_callback(sender, instance, *args, **kwargs):
+    if not instance.title:
+        count = sender.objects.filter(user=instance.user).count()
+        index = '' if not count else ' (' + str(count) + ')'
+        instance.title = 'Untitled diagram' + index
 
 class Message(models.Model):
     index = models.IntegerField(verbose_name='message id inside the chat')
@@ -36,7 +46,7 @@ class Message(models.Model):
         'A': 'assistant'
     }
     origin = models.CharField(max_length=1, choices=choices)
-    diagram = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    diagram = models.ForeignKey(Diagram, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.content
@@ -58,13 +68,32 @@ class Format(models.Model):
     def __str__(self):
         return self.value
 
-class File(models.Model):
-    diagram = models.ForeignKey(Chat, on_delete=models.CASCADE)
-    file = models.FileField(upload_to='modeler/diagrams/')
-    format = models.ForeignKey(Format, on_delete=models.CASCADE)
+def user_directory_path(instance, filename): 
+  
+    # file will be uploaded to MEDIA_ROOT / user_<id>/<filename> 
+    return 'user_{0}/modeler/diagrams/{1}/{2}'.format(instance.diagram.user.id, instance.format, filename)
+
+class FileQuerySet(models.QuerySet):
+
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.file.delete()
+        super(FileQuerySet, self).delete(*args, **kwargs)
+
+class Tool(models.Model):
     choices = {
-        'G': 'Gojs',
         'P': 'Plantuml',
         'M': 'Mermaid'
     }
-    software = models.CharField(max_length=1, choices=choices)
+    value = models.CharField(max_length=1, choices=choices, unique=True)
+
+    def __str__(self):
+        return self.value
+
+class File(models.Model):
+    diagram = models.ForeignKey(Diagram, on_delete=models.CASCADE)
+    file = models.FileField(upload_to=user_directory_path)
+    format = models.ForeignKey(Format, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+
+    objects = FileQuerySet.as_manager()

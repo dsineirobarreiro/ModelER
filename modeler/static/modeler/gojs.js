@@ -1,9 +1,11 @@
-function init(data) {
+export function init(data) {
+
+    data = JSON.parse(data)
     // Since 2.2 you can also author concise templates with method chaining instead of GraphObject.make
     // For details, see https://gojs.net/latest/intro/buildingObjects.html
     const $ = go.GraphObject.make; // for conciseness in defining templates
 
-    myDiagram = new go.Diagram(
+    let myDiagram = new go.Diagram(
       'myDiagramDiv', // must name or refer to the DIV HTML element
       {
         allowDelete: false,
@@ -190,7 +192,62 @@ function init(data) {
       )
     );
 
-    // create the model for the E-R diagram
+    let nodeDataArray = [];
+    let x = 0, y = 0;
+
+    // Centro del canvas
+    const centerX = 400;
+    const centerY = 400;
+
+    // Número de vértices
+    const vertices = data.entities.length;
+
+    // Distancia del centro a cada entidad
+    const radius = 50 * vertices;
+
+    // Función para dibujar el polígono
+    function createVertices(centerX, centerY, radius, vertices) {
+      let points = []
+      for (let i = 0; i < vertices; i++) {
+          const angle = (i * 2 * Math.PI) / vertices;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          points.push([x,y])
+      }
+      return points;
+    }
+
+    let points = createVertices(centerX, centerY, radius, vertices);
+    let count = 0;
+
+    for (const ent of data.entities) {
+      let x = points[count][0], y = points[count][1]
+      let attrs = [];
+      for (const attr of ent.attributes) {
+        attrs.push(
+          { name: attr.name, iskey: true, figure: 'Decision', color: 'purple' }
+        )
+      }
+
+      nodeDataArray.push(
+        {
+          key: ent.name,
+          location: new go.Point(x, y),
+          items: attrs
+        }
+      );
+
+      count++;
+    }
+  
+    let linkDataArray = [];
+    for (const rel of data.relations) {
+      linkDataArray.push(
+        { from: rel.source, to: rel.target, text: '0..N', toText: '1' }
+      )
+    }
+
+    /*
     const nodeDataArray = [
       {
         key: 'Products',
@@ -243,12 +300,14 @@ function init(data) {
         inheritedItems: [{ name: 'ProductID', iskey: false, figure: 'Decision', color: 'purple' }],
       },
     ];
+    
+    
     const linkDataArray = [
       { from: 'Products', to: 'Suppliers', text: '0..N', toText: '1' },
       { from: 'Products', to: 'Categories', text: '0..N', toText: '1' },
       { from: 'Order Details', to: 'Products', text: '0..N', toText: '1' },
       { from: 'Categories', to: 'Suppliers', text: '0..N', toText: '1' },
-    ];
+    ];*/
     myDiagram.model = new go.GraphLinksModel({
       copiesArrays: true,
       copiesArrayObjects: true,
@@ -257,7 +316,7 @@ function init(data) {
     });
   }
 
-  const changeTheme = () => {
+  export const changeTheme = () => {
     const myDiagram = go.Diagram.fromDiv('myDiagramDiv');
     if (myDiagram) {
       myDiagram.themeManager.currentTheme = document.getElementById('theme').value;

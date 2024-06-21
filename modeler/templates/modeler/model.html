@@ -13,7 +13,21 @@
     <script src="{% static 'modeler/mermaid.js' %}" type="module"></script>
     <script src="https://unpkg.com/gojs"></script>
     <script src="{% static 'modeler/extensions/Themes.js' %}"></script>
-    <script src="{% static 'modeler/gojs.js' %}"></script>
+    <script src="{% static 'modeler/gojs.js' %}" type="module"></script>
+{% endblock %}
+
+{% block title %}
+<div>
+    <div class="input-group">
+        <form action="{% url 'modeler:diagram' diagram %}" method="post">
+            {% csrf_token %}
+            <input type="text" name="title" value="{{diagram}}" class="card-title form-control fs-4" data-diagram-title="{{diagram.pk}}" disabled/>
+        </form>
+        <button class="btn btn-primary edit" data-diagram-btn="{{diagram.pk}}">
+            <i class="fa-solid fa-pencil"></i>
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +36,7 @@
 
         {% if token %}
             
-            <div class="grid model-grid {{MEDIA_ROOT}}">
+            <div class="grid model-grid">
 
                 <div class="diagram grid" id="diagram" data-diagram-id="{{diagram.pk}}">
                     <div class="container">
@@ -34,46 +48,36 @@
                             </div>
     
                             <div class="dropend col-1">
-                                <button class="btn dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                     <i class="fa-solid fa-bars fa-2xl"></i>
                                 </button>
-                                    <ul class="dropdown-menu" id="download-menu">
-                                        {% if files %}
-                                            {% for file in files %}
-                                            <li><a class="dropdown-item" id="plantuml-{{file.format.value}}" href="/media/{{file.file}}" download>Download {{file.get_software_display}} as {{file.format.value}}</a></li>
-                                            {% endfor %}
-                                        {% else %}
-                                            <li><div class="p-2">No files yet</div></li>
-                                        {% endif %}
-                                    </ul>
+                                <ul class="dropdown-menu" id="download-menu">
+                                {% for key,value in files.items %}
+                                    <li>
+                                        <div class="btn-group dropend d-grid">
+                                            <button type="button" class="btn dropdown-toggle text-start" data-bs-toggle="dropdown" aria-expanded="false">
+                                              {{key}}
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                {% for tool,src in value.items %}
+                                                <li><a class="dropdown-item" id="{{tool|lower}}-{{key}}" href="{{src}}" download>Download {{tool}} as {{key}}</a></li>
+                                                {% empty %}
+                                                <li><div class="p-2">No {{key}} files yet</div></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                </ul>
                             </div>
                         </div>
                         
 
                     </div>
-                    <!--div class="model-tabs">
-                        <button class="tab btn tab-btn" id="defaultOpen" name="gojs" onclick="openTab('gojs'); openDiagram(0)">
-                            <span>GoJS</span>
-                        </button>
-                        <button class="tab btn tab-btn" name="mermaid" onclick="openTab('mermaid'); openDiagram(1)">
-                            <span>Mermaid</span>
-                        </button>
-                        <button class="tab btn tab-btn" name="plantuml" onclick="openTab('plantuml'); openDiagram(2)">
-                            <span>PlantUml</span>
-                        </button>
-                        <button class="btn dropdown-toggle float-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bars fa-2xl"></i>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Download PlantUML as PNG</a></li>
-                          </ul>
-            
-                        <div class="slide" id="slide"></div>
-                    </div-->
 
                     <div class="tab-content" id="nav-tabContent">
                         <div class="tab-pane fade show active" id="nav-gojs" role="tabpanel" aria-labelledby="nav-gojs-tab" tabindex="0">
-                            <div id="myDiagramDiv" style="height: 95%;"></div>
+                            <div id="myDiagramDiv" style="height: 65vh;"></div>
                             <select id="theme" onchange="changeTheme()">
                                 <option value="system">System</option>
                                 <option value="light">Light</option>
@@ -81,30 +85,15 @@
                             </select>
                         </div>
                         <div class="tab-pane fade" id="nav-mermaid" role="tabpanel" aria-labelledby="nav-mermaid-tab" tabindex="1">
-                            <pre class="mermaid" id="merm-graph"></pre>
+                            <pre class="mermaid" id="merm-graph">
+                                <img src="{{mermaid}}" id="mermaid-diagram" style="max-height: 70vh;"/>
+                            </pre>
                         </div>
                         <div class="tab-pane fade" id="nav-plantuml" role="tabpanel" aria-labelledby="nav-plantuml-tab" tabindex="2">
-                            <img src="" id="plant-diagram">
+                            <img src={{plant}} id="plant-diagram">
                         </div>
                         <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab" tabindex="0">...</div>
                     </div>
-                    <!--
-                    <div id="gojs" class="tab-content">
-                        <div id="myDiagramDiv" style="height: 95%;"></div>
-                        <select id="theme" onchange="changeTheme()">
-                            <option value="system">System</option>
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
-                        </select>
-                    </div>
-
-                    <div id="mermaid" class="tab-content">
-                        <pre class="mermaid" id="merm-graph"></pre>
-                    </div>
-
-                    <div id="plantuml" class="tab-content">
-                    </div>
-                -->
                 </div>
                 
 
@@ -143,14 +132,70 @@
 
             <script>
 
-                function openDiagram(index) {
-                    var slide;
-                    slide = document.getElementById("slide");
-                    
-                    let left = 30 * index;
-                    slide.style.left = left.toString() + '%';
+                let titles, buttons;
+        
+                function submitForm(form, id) {
+                    const url = window.location.origin + '/modeler/diagram/' + id + '/edit';
+                    console.log(form);
+                    var formData = new FormData(form);
+                    const request = new Request(
+                        url,
+                        {
+                            method: 'POST',
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest",
+                            },
+                            body: formData,
+                        }
+                    );
+                    fetch(request)
+                        .then(async (response) => {
+                            if (response.ok) {
+                                console.log('Exito');
+                            }else{
+                                console.log('error');
+                            }
+                        })
                 }
-                
+        
+                function addBlurEvent(elem){
+        
+                    const form = elem.parentNode;
+        
+                    form.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                    })
+        
+                    elem.addEventListener("blur", (event) => {
+                        submitForm(form, elem.getAttribute('data-diagram-title'));
+                        elem.disabled = true;
+                    });
+        
+                    elem.addEventListener("keypress", (event) => {
+                        if (event.key === "Enter") {
+                            elem.blur();
+                        }
+                    });
+                }
+        
+                document.addEventListener("DOMContentLoaded", () => {
+                    buttons = document.getElementsByClassName("edit");
+                    titles = document.getElementsByClassName('card-title');
+        
+                    Array.prototype.forEach.call(titles, function(elem) {
+                        addBlurEvent(elem);
+                    });
+        
+                    Array.prototype.forEach.call(buttons, function(elem) {
+                        elem.addEventListener("click", () => {
+                            let title = document.querySelector('[data-diagram-title="' + elem.getAttribute('data-diagram-btn') + '"]');
+                            title.disabled = false;
+                            title.select();
+                            title.focus();
+                        });
+                    });
+                });
+        
             </script>
 
         {% else %}

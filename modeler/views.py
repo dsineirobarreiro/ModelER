@@ -1,7 +1,7 @@
 import asyncio
 import httpx
 
-from django.http import JsonResponse, StreamingHttpResponse, HttpResponseBadRequest
+from django.http import JsonResponse, QueryDict, StreamingHttpResponse, HttpResponseBadRequest
 from django.views.generic import TemplateView, ListView, FormView
 from django.views import View
 from django.shortcuts import render, redirect
@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import PromptForm, DiagramForm, FileForm, TokenForm
-from .models import Llm, Token, Chat, Message, File, Format
+from .models import Llm, Token, Diagram, Message, File, Format, Tool
 
 from users.forms import UserChangeForm
 
@@ -27,9 +27,6 @@ async def stream_http(request):
 
 class StreamView(TemplateView):
     template_name = "modeler/stream.html"
-
-    async def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
         
 
 class IndexView(TemplateView):
@@ -48,7 +45,7 @@ class DiagramSelectionView(LoginRequiredMixin, TemplateView):
     template_name = 'modeler/diagram_selection.html'
 
     def post(self, request, *args, **kwargs):
-        diagram = Chat(user=request.user)
+        diagram = Diagram(user=request.user, title=request.POST['title'])
         diagram.save()
         return redirect(reverse(f'modeler:model', kwargs={'llm': 'llama2', 'pk': diagram}))
 
@@ -66,11 +63,26 @@ class ModelView(LoginRequiredMixin, FormView):
             token = Token.objects.filter(user=self.request.user, llm=llm).first()
         token = True if token else False
         form = self.form_class(initial=self.initial)
-        message_list = Message.objects.filter(diagram=diagram)
-        files = []
-        for file in File.objects.filter(diagram=diagram):
-            files.append(file)
-        return render(request, self.template_name, {'llm': llm, 'diagram': diagram, 'token': token, 'form': form, 'message_list': message_list, 'files': files})
+        message_list = Message.objects.filter(diagram=diagram).order_by()
+        files = {}
+        formats = Format.objects.all()
+        tools = Tool.objects.all()
+        for format in formats:
+            files[format.value] = {}
+            for tool in tools: 
+                file = File.objects.filter(diagram=diagram, format=format, tool=tool).last()
+                if file:
+                    files[format.value][tool.get_value_display()] = file.file.url
+        return render(request, self.template_name, {
+            'llm': llm,
+            'diagram': diagram,
+            'token': token,
+            'form': form,
+            'message_list': message_list,
+            'files': files,
+            'plant': files['png'].get('Plantuml', ''),
+            'mermaid': files['svg'].get('Mermaid',''),
+        })
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -88,7 +100,7 @@ class ModelView(LoginRequiredMixin, FormView):
                     with httpx.Client(timeout=None) as client:
                         with client.stream(
                             "POST",
-                            "http://localhost:8001/llama/greet/",
+                            "http://localhost:8001/llama2/generate/",
                             headers=headers,
                             data=form
                         ) as r:
@@ -96,8 +108,11 @@ class ModelView(LoginRequiredMixin, FormView):
                                 # Work on chunk and then stream it
                                 msg += text
                                 yield text
-                    message = Message(index=Message.next_index(kwargs['pk']), content=msg, origin='A', diagram=kwargs['pk'])
+                    diagram = kwargs['pk']
+                    message = Message(index=Message.next_index(kwargs['pk']), content=msg, origin='A', diagram=diagram)
                     message.save()
+                    diagram.elements = message
+                    diagram.save()
 
                     
                 return StreamingHttpResponse(
@@ -157,7 +172,7 @@ class ProfileDiagramsView(LoginRequiredMixin, TemplateView):
             'diagrams': 'active',
             'tokens': ''
         }
-        diagrams = Chat.objects.filter(user=request.user)
+        diagrams = Diagram.objects.filter(user=request.user)
         return render(request, self.template_name, {'active': active, 'diagramset': diagrams})
 
 class ProfileTokensView(LoginRequiredMixin, TemplateView):
@@ -178,7 +193,6 @@ class DiagramView(LoginRequiredMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-        print(request.POST)
         if form.is_valid():
             title = form.cleaned_data['title']
             diagram = self.kwargs['pk']
@@ -193,7 +207,6 @@ class TokenView(LoginRequiredMixin, FormView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
-        print(request.POST)
         if form.is_valid():
             value = form.cleaned_data['value']
             token = self.kwargs['pk']
@@ -207,16 +220,18 @@ class DiagramDownloadView(LoginRequiredMixin, FormView):
     form_class = FileForm
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
+        post_dict = request.POST.copy()
+        post_dict['tool'] = Tool.objects.filter(value=request.POST['tool']).first()
+        form = self.form_class(post_dict, request.FILES)
         if form.is_valid():
             file_content = form.cleaned_data['file']
-            software = form.cleaned_data['software']
+            tool = form.cleaned_data['tool']
             diagram = self.kwargs['pk']
             format = Format.objects.filter(value=kwargs['format']).first()
             if not format:
                 return HttpResponseBadRequest({'error': 'Form not valid'})
-            file = File(diagram=diagram, format=format, file=file_content, software=software)
+            file = File(diagram=diagram, format=format, file=file_content, tool=tool)
             file.save()
-            return JsonResponse({'msg': 'Successfull'})
+            return JsonResponse({'path': file.file.url, 'tool': file.tool.get_value_display(), 'format': file.format.value})
         else:
             return HttpResponseBadRequest({'error': 'Form not valid'})

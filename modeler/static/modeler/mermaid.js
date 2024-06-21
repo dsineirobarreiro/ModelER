@@ -35,7 +35,6 @@ const source_relations = {
       merm += `${rel.source} ${source_relations[rel.cardinality_of_source]}--${target_relations[rel.cardinality_of_target]}${rel.target}: ${rel.name}\n`;
     }
   
-    console.log(merm);
     return merm;
   }
     
