@@ -41,13 +41,13 @@ class ModelListView(ListView):
     model = Llm
     template_name = 'modeler/model_list.html'
 
-class DiagramSelectionView(LoginRequiredMixin, TemplateView):
-    template_name = 'modeler/diagram_selection.html'
-
     def post(self, request, *args, **kwargs):
         diagram = Diagram(user=request.user, title=request.POST['title'])
         diagram.save()
         return redirect(reverse(f'modeler:model', kwargs={'llm': 'llama2', 'pk': diagram}))
+
+class DiagramSelectionView(LoginRequiredMixin, TemplateView):
+    template_name = 'modeler/diagram_selection.html'
 
 class ModelView(LoginRequiredMixin, FormView):
     form_class = PromptForm
@@ -80,7 +80,7 @@ class ModelView(LoginRequiredMixin, FormView):
             'form': form,
             'message_list': message_list,
             'files': files,
-            'plant': files['png'].get('Plantuml', ''),
+            'plant': files['png'].get('Plantuml', '#'),
             'mermaid': files['svg'].get('Mermaid',''),
         })
 
@@ -89,6 +89,8 @@ class ModelView(LoginRequiredMixin, FormView):
 
         if form.is_valid():
             prompt = form.cleaned_data['prompt']
+            action = form.cleaned_data['action']
+            print(action)
             user_message = Message(index=Message.next_index(kwargs['pk']), content=prompt, origin='U', diagram=kwargs['pk'])
             user_message.save()
 
@@ -100,7 +102,7 @@ class ModelView(LoginRequiredMixin, FormView):
                     with httpx.Client(timeout=None) as client:
                         with client.stream(
                             "POST",
-                            "http://localhost:8001/llama2/generate/",
+                            f"https://bright-akita-pleasantly.ngrok-free.app/llama2/{action}/",
                             headers=headers,
                             data=form
                         ) as r:
@@ -109,9 +111,10 @@ class ModelView(LoginRequiredMixin, FormView):
                                 msg += text
                                 yield text
                     diagram = kwargs['pk']
+                    print(msg)
                     message = Message(index=Message.next_index(kwargs['pk']), content=msg, origin='A', diagram=diagram)
                     message.save()
-                    diagram.elements = message
+                    diagram.elements = msg
                     diagram.save()
 
                     
@@ -120,6 +123,12 @@ class ModelView(LoginRequiredMixin, FormView):
                 )
                 
             return generate(headers, form.cleaned_data)
+        else:
+            def error():
+                error_message = 'Sorry, a bad response was obtained from the server. Try again please.'
+                for string in error_message:
+                    yield string
+            return StreamingHttpResponse(error())
 
 class ProfileGeneralView(LoginRequiredMixin, TemplateView):
     template_name = 'modeler/profile/general.html'

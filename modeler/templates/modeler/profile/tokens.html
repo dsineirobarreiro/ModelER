@@ -4,7 +4,10 @@
 {% block profile %}
         
     <div id="tokens" class="profile-tab-content tab-content">
-        <h3>Tokens</h3>
+        <div class="d-flex gap-4 mb-3">
+            <h3>Tokens</h3>
+            <button class="btn btn-primary edit" data-token-btn="{{token.pk}}">Add</button>
+        </div>
         {% for token in tokens %}
         <div class="card mb-3">
             <div class="card-header">
@@ -16,6 +19,7 @@
                     <input type="password" name="value" value="{{ token }}" class="form-control token-value mb-3" data-token-value="{{token.pk}}" disabled/>
                 </form>
                 <button class="btn btn-primary edit" data-token-btn="{{token.pk}}">Edit</button>
+                <button class="btn btn-primary edit" data-token-btn="{{token.pk}}">Delete</button>
             </div>
             <div class="card-footer text-body-secondary">
             Do not share this API token to anyone

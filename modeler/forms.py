@@ -4,7 +4,8 @@ from .models import Diagram, File, Token
 
 
 class PromptForm(forms.Form):
-    prompt = forms.CharField(label='Describe your scenario', widget=forms.Textarea(attrs={'cols': 60, 'rows': 1, 'placeholder': 'Type your prompt'}))
+    prompt = forms.CharField(label='Describe your scenario', widget=forms.Textarea(attrs={'cols': 58, 'rows': 1, 'placeholder': 'Type your prompt'}))
+    action = forms.CharField()
 
 class DiagramForm(forms.ModelForm):
     class Meta:

@@ -130,8 +130,7 @@ main {
 }
 
 .profile-btn {
-    margin-right: 40px;
-    background-color: transparent;
+    border-color: transparent !important;
 }
 
 #profile-icon {
@@ -478,6 +477,10 @@ textarea {
     border-right: 1px solid #cecece;
 }
 
+.visual {
+    height: 100%;
+}
+
 .model-tabs {
     position: relative;
 }
@@ -549,6 +552,17 @@ textarea {
     background-color: #ffffff;
 }
 
+.mermaid {
+    display: flex;
+    justify-content: center;
+}
+
+#theme {
+    position: relative;
+    float: right;
+    top: 0;
+}
+
 .pulse {
     animation: pulse-animation 2s infinite;
   }
@@ -582,6 +596,7 @@ textarea {
     background-color: #d6d6d6;
     padding: 15px;
     border-radius: 12px;
+    max-width: 80%;
 }
 
 .response {

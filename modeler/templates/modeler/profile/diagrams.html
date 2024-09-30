@@ -17,6 +17,7 @@
                         </form>
                         <a href="{% url 'modeler:model' 'llama2' diagram %}" class="btn btn-primary">Open</a>
                         <button class="btn btn-primary edit" data-diagram-btn="{{diagram.pk}}">Edit</button>
+                        <button class="btn btn-primary edit" data-diagram-btn="{{diagram.pk}}">Delete</button>
                     </div>
                     <div class="card-footer text-body-secondary">
                     {{ diagram.last_modified }}

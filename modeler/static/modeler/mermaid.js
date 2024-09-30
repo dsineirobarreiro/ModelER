@@ -20,10 +20,11 @@ const source_relations = {
   function convert(data) {
     let merm = 'erDiagram\n';
     for (const ent of data.entities) {
-      merm += `${ent.name} {\n`;
-      merm += `  int ${ent.name}ID PK\n`;
+      let entName = ent.name.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+      merm += `${entName} {\n`;
+      merm += `  int ${entName}ID PK\n`;
       for (const attr of ent.attributes) {
-        const name = attr.name.replaceAll(' ', '_');
+        const name = attr.name.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join('');
         if (!name.toLowerCase().includes('id')) {
           merm += `  ${attr.type} ${name}\n`;
         }
@@ -32,9 +33,11 @@ const source_relations = {
     }
   
     for (const rel of data.relations) {
-      merm += `${rel.source} ${source_relations[rel.cardinality_of_source]}--${target_relations[rel.cardinality_of_target]}${rel.target}: ${rel.name}\n`;
+      merm += `${rel.source.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join('')} ${source_relations[rel.cardinality_of_source]}--${target_relations[rel.cardinality_of_target]} ${rel.target.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join('')}: ${rel.name.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join('')}\n`;
     }
   
+    console.log(merm);
+    
     return merm;
   }
     

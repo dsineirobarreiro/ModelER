@@ -23,17 +23,17 @@ const targetRelations = {
 function convert(data) {
     let uml = '@startuml\n';
     for (let entity of data.entities) {
-        uml += 'entity ' + entity.name + '{\n';
-        uml += '* ' + entity.name + 'ID: number <<generated>>\n--\n';
+        uml += 'entity "' + entity.name + '" {\n';
+        uml += '* "' + entity.name + 'ID" : number <<generated>>\n--\n';
         for (let attribute of entity.attributes) {
             if (attribute.name.toLowerCase().includes('id')) continue;
-                uml += '* ' + attribute.name + ': ' + attribute.type + '\n';
+                uml += '* "' + attribute.name + '": ' + attribute.type + '\n';
             }
         uml += '}\n\n';
     }
 
     for (let relation of data.relations) {
-        uml += relation.source + ' ' + sourceRelations[relation.cardinality_of_source] + '--' + targetRelations[relation.cardinality_of_target] + relation.target + '\n';
+        uml += '"' + relation.source + '" ' + sourceRelations[relation.cardinality_of_source] + '--' + targetRelations[relation.cardinality_of_target] + ' "' + relation.target + '"\n';
     }
 
     uml += '@enduml';

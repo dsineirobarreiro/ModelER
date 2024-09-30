@@ -2,8 +2,19 @@ import { createMermaidDiagram } from './mermaid.js'
 import { createUmlDiagram } from './plantUml.js';
 import { init } from './gojs.js';
 
+let tooltipTriggerList, tooltipList;
+
+document.addEventListener("DOMContentLoaded", function() {
+    tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    let gojs = document.querySelector('#myDiagramDiv');
+    let elements = gojs.getAttribute('data-elements');
+
+    init(elements);
+});
+
 let input = document.querySelector("#id_prompt");
-let button = document.querySelector("#send");
 let chat = document.querySelector('#chat');
 export const dgram = document.querySelector('#diagram');
 
@@ -11,17 +22,14 @@ let msgId = parseInt(chat.getAttribute('data-last-index')) + 1;
 
 let diagram = [];
 
-button.disabled = true; //setting button state to disabled
-
-
 input.addEventListener("input", updateValue);
 
 function updateValue(e) {
     input.value = e.target.value;
     if (input.value === "") {
-        button.disabled = true; //button remains disabled
+        send.disabled = true; //button remains disabled
     } else {
-        button.disabled = false; //button is enabled
+        send.disabled = false; //button is enabled
     }
 }
 
@@ -30,12 +38,17 @@ function updateValue(e) {
 // Get csrf token
 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 const form = document.querySelector('#promptForm');
+const send = document.querySelector('#send');
+const gen = document.querySelector('#gen');
+
+send.disabled = true; //setting button state to disabled
 
 //// Functions
 
-$("#promptForm").on("submit", function(event) {
+function submitForm(event, action) {
     event.preventDefault();
     var formData = new FormData(form);
+    formData.append('action', action);
     console.log(formData.get('prompt'));
     var url = window.location.href;
     const request = new Request(
@@ -51,7 +64,7 @@ $("#promptForm").on("submit", function(event) {
     );
     document.getElementById('promptForm').reset();
     //setting inputs state to disabled
-    button.disabled = true; 
+    send.disabled = true; 
     input.disabled = true;
 
     chat.innerHTML += `
@@ -101,7 +114,7 @@ $("#promptForm").on("submit", function(event) {
                                 createMermaidDiagram(msg.innerText);
                                 createUmlDiagram(msg.innerText);
                                 init(msg.innerText);
-                                button.disabled = false; 
+                                send.disabled = false; 
                                 input.disabled = false;
                                 controller.close();
                                 return;
@@ -122,7 +135,15 @@ $("#promptForm").on("submit", function(event) {
             });
 
         })
+}
+
+send.addEventListener("click", function(event) {
+    submitForm(event, 'generate')
 })
+
+/*gen.addEventListener("click", function(event) {
+    submitForm(event, 'generate')
+})*/
 
 async function *parseJsonStream(readableStream) {
     for await (const line of readLines(readableStream.getReader())) {
