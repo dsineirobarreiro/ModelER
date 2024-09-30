@@ -1,4 +1,4 @@
-# AsyncModelER
+# ModelER
 
 ## How to run it
 
